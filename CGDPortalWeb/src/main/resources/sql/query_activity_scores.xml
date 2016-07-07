@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="ACTSCORES.INSERT_ACT_SCORES" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			INSERT INTO tp_activity_scores 
+				(ACT_SEQ, ACT_NAME, ACT_ACTION_CODE, 
+				ACT_ENABLED, REG_ID, REG_DT , ACT_DESC ,ACT_SCORES, CHG_ID, CHG_DT) 
+			VALUES (:actSeq, :actName, :actActionCode, 
+				:actEnabled, :createBy, NOW() , :actDesc , :actScores,:createBy, NOW())		
+					
+		]]>
+		</query>
+		<parameter name="actSeq" required="true" />
+		<parameter name="actName" required="true" />
+		<parameter name="actActionCode" required="true" />
+		<parameter name="actEnabled" required="true" />
+		<parameter name="createBy" required="true" />
+		<parameter name="actDesc" required="false"/>
+		<parameter name="actScores" required="false" />
+	</sql-service>
+	
+	<sql-service name="ACTSCORES.UPDATE_ACT_SCORES" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			UPDATE tp_activity_scores SET
+			   ACT_SEQ = :actSeq
+			  ,ACT_NAME = :actName
+			  ,ACT_ACTION_CODE = :actActionCode
+			  ,ACT_ENABLED = :actEnabled
+			  ,CHG_ID = :updateBy
+			  ,CHG_DT = NOW()
+			  ,ACT_SCORES = :actScores
+			  ,ACT_DESC = :actDesc
+			WHERE ACT_ID = :actId
+					
+		]]>
+		</query>
+		<parameter name="actId" required="true" />
+		<parameter name="actSeq" required="true" />
+		<parameter name="actName" required="true" />
+		<parameter name="actActionCode" required="true" />
+		<parameter name="actEnabled" required="true" />
+		<parameter name="updateBy" required="true" />
+		<parameter name="actDesc" required="false"/>
+		<parameter name="actScores" required="false" />
+	</sql-service>
+	
+	<sql-service name="ACTSCORES.FIND_BY_ID" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT *
+			FROM tp_activity_scores
+			WHERE ACT_ID = :actId
+					
+		]]>
+		</query>
+		<parameter name="actId" required="true" />
+	</sql-service>
+	
+	<sql-service name="ACTSCORES.FIND_BY_NAME" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT *
+			FROM tp_activity_scores
+			WHERE ACT_NAME like :actName
+			ORDER BY ACT_SEQ, ACT_NAME
+		]]>
+		</query>
+		<parameter name="actName" required="true" prefix="%" suffix="%" />
+	</sql-service>
+	
+</query-collection>

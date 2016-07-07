@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="BRANCH.SQL_FIND_ALL_BRANCH" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+			SELECT branch_code, 
+					branch_name 
+			FROM st_branch 
+			ORDER BY branch_name;
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="BRANCH.SQL_FIND_SELECTED_BRANCH_CONTENT_BY_CONTENTNUMBER" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+			SELECT 
+			    branch_code
+			FROM
+			    st_branch_content
+			WHERE 
+				content_number = :contentNumber
+		]]>
+		</query>
+		<parameter name="contentNumber" required="true" />
+	</sql-service>
+	
+	<sql-service name="BRANCH.SQL_FIND_BY_BRANCHCODE" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			SELECT 
+		     	b.branch_code,
+			    b.branch_name,
+			    b.telephone_no,
+			    b.email,
+			    b.fax_no,
+			    b.room_no,
+			    b.building,
+			    b.moo,
+			    b.soi,
+			    b.road,
+				un.unit_name,
+			    am.name as amphur,
+			    pr.name as province,
+			    tu.name as tumbon,
+			    re.name as region,
+				po.postcode,
+				b.latitude,
+				b.longtitude,
+				b.email
+			FROM
+			    st_branch b
+			        LEFT JOIN
+			    st_amphur am ON b.amphur_code = am.AMPHUR_code
+			        LEFT JOIN
+			    st_province pr ON b.province_code = pr.province_code
+			        LEFT JOIN
+			    st_tumbon tu ON b.tumbon_code = tu.tumbon_code
+				    LEFT join
+				st_region re on pr.region_code = re.region_code
+					LEFT join
+				st_postcode po on (b.amphur_code = po.amphur_code 
+						AND b.province_code = po.province_code 
+						AND b.tumbon_code = po.tumbon_code)
+					LEFT JOIN
+				st_unitcode un on b.unit_code = un.unit_code
+			WHERE
+			    branch_code = :branchCode
+			ORDER BY branch_code;
+		]]>
+		</query>
+		<parameter name="branchCode" required="true" />
+	</sql-service>
+	<sql-service name="BRANCH.SQL_UPDATE_BRANCH_ADDR_LATLNG" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+			UPDATE st_branch
+			SET
+			latitude = :lat,
+			longtitude = :lon
+			WHERE branch_code = :branchCode;
+		]]>
+		</query>
+		<parameter name="branchCode" required="true" />
+		<parameter name="lat" required="true" />
+		<parameter name="lon" required="true" />
+	</sql-service>
+	<sql-service name="BRANCH.SQL_FIND_ALL_BRANCH_WITH_UNITNAME" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+			SELECT  b.branch_code, 
+					b.branch_name,
+					un.unit_name 
+			FROM st_branch b,
+				 st_unitcode un
+			WHERE
+				b.unit_code = un.unit_code
+			ORDER BY un.unit_name, b.branch_name;
+		]]>
+		</query>
+	</sql-service>
+</query-collection>

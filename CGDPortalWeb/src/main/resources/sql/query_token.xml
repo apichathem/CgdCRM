@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+
+	<sql-service name="TOKEN.SQL_GENERATE_TOKEN" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		INSERT INTO TP_LOGIN_TOKEN(TOKEN_CODE, CREATED_DATE, CREATED_TIME ,CREATED_BY , EXPIRED_DATE , EXPIRED_TIME , USER_NAME, TOKEN_ACTIVE_FLG , DEVICE_ID , SESSION_ID)
+   			VALUES( :TOKEN_CODE, :CREATED_DATE , :CREATED_TIME, :CREATED_BY, :EXPIRED_DATE , :EXPIRED_TIME  , :USER_NAME , 1 , :DEVICE_ID , :SESSION_ID)
+
+		]]>
+		</query>
+		<parameter name="TOKEN_CODE" required="true"/>
+		<parameter name="CREATED_DATE" />
+		<parameter name="CREATED_TIME" />
+		<parameter name="CREATED_BY" />
+		<parameter name="EXPIRED_DATE" />
+		<parameter name="EXPIRED_TIME" />
+		<parameter name="USER_NAME" />
+		<parameter name="DEVICE_ID" />
+		<parameter name="SESSION_ID" />
+	</sql-service>
+	
+	
+	<sql-service name="TOKEN.SQL_CHECK_TOKEN_EXIST_BY_DEVICE_ID_AND_USER_NAME" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		SELECT count(*) FROM TP_LOGIN_TOKEN WHERE DEVICE_ID = :DEVICE_ID and USER_NAME = :USER_NAME
+		
+		]]>
+		</query>
+		<parameter name="DEVICE_ID" required="true"/>
+		<parameter name="USER_NAME" required="true"/>
+	</sql-service>
+	
+	<sql-service name="TOKEN.SQL_UPDATE_TOKEN" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		UPDATE TP_LOGIN_TOKEN set
+			TOKEN_CODE = :TOKEN_CODE,
+			EXPIRED_DATE = :EXPIRED_DATE,
+			EXPIRED_TIME = :EXPIRED_TIME,
+			TOKEN_ACTIVE_FLG = 1,
+			SESSION_ID = :SESSION_ID
+		
+		WHERE 
+			DEVICE_ID = :DEVICE_ID and USER_NAME = :USER_NAME
+
+		]]>
+		</query>
+		<parameter name="TOKEN_CODE" required="true"/>
+		<parameter name="CREATED_DATE" />
+		<parameter name="CREATED_TIME" />
+		<parameter name="EXPIRED_DATE" />
+		<parameter name="EXPIRED_TIME" />
+		<parameter name="USER_NAME" required="true"/>
+		<parameter name="DEVICE_ID" required="true"/>
+		<parameter name="SESSION_ID" />
+	</sql-service>
+	
+	<sql-service name="TOKEN.SQL_DESTROY_TOKEN" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		UPDATE TP_LOGIN_TOKEN 
+    		SET TOKEN_ACTIVE_FLG = 0 
+    	WHERE 	TOKEN_CODE = :TOKEN_CODE 
+		]]>
+		</query>
+		<parameter name="TOKEN_CODE" required="true"/>
+	</sql-service>
+	
+	<sql-service name="TOKEN.SQL_VALIDATE_TOKEN" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		SELECT 
+		
+			TOKEN_ID AS TOKEN_ID,
+			TOKEN_CODE AS TOKEN_CODE
+		
+		FROM TP_LOGIN_TOKEN
+		
+		WHERE 
+			1=1 LIMIT 1
+		]]>
+		</query>
+		<parameter name="TOKEN_CODE" required="true"/>
+		<parameter name="CURRENT_DATETIME" required="true"/>
+	</sql-service>
+	
+	<sql-service name="TOKEN.SQL_VALIDATE_TOKEN_BACKUP" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		SELECT 
+		
+			TOKEN_ID AS TOKEN_ID,
+			TOKEN_CODE AS TOKEN_CODE
+		
+		FROM TP_LOGIN_TOKEN
+		
+		WHERE 
+			TOKEN_CODE = :TOKEN_CODE
+		AND
+			TOKEN_ACTIVE_FLG = 1
+		AND 
+			CONCAT(EXPIRED_DATE,EXPIRED_TIME) >= :CURRENT_DATETIME
+		
+		]]>
+		</query>
+		<parameter name="TOKEN_CODE" required="true"/>
+		<parameter name="CURRENT_DATETIME" required="true"/>
+	</sql-service>
+	
+	
+	<sql-service name="TOKEN.SQL_UPDATE_PASSCODE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		
+		UPDATE TP_LOGIN_TOKEN set
+		
+			PASSCODE = :PASSCODE
+		
+		WHERE 
+			DEVICE_ID = :DEVICE_ID and USER_NAME = :USER_NAME
+
+		]]>
+		</query>
+		<parameter name="PASSCODE" required="true"/>
+		<parameter name="USER_NAME" required="true"/>
+		<parameter name="DEVICE_ID" required="true"/>
+	</sql-service>
+
+</query-collection>

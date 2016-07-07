@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="ATT.SQL_INSERT_TP_ATT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_ATT (
+				   FILE_PATH
+				  ,FILE_NAME
+				  ,FILE_EXTENSION
+				  ,FILE_TYPE
+				  ,ACTIVE_FLG
+				  ,ATT_SOURCE_CODE
+				  ,USER_PICTURE
+				  ,REG_ID
+				  ,REG_DT
+				  ,CHG_ID
+				  ,CHG_DT
+				  ,ATT_TYPE
+				  ,FILE_SIZE
+				) VALUES (
+				   :filePath -- FILE_PATH - varchar(255)
+				  ,:fileName -- FILE_NAME - varchar(255)
+				  ,substring(:fileExtension,0,10) -- FILE_EXTENSION - varchar(10)
+				  ,:fileType -- FILE_TYPE - varchar(20)
+				  ,:activeFlg -- ACTIVE_FLG - char(1)
+				  ,:attSourceCode -- ATT_SOURCE_CODE - varchar(6)
+				  ,:userPicture -- USER_PICTURE - varchar(10)
+				  ,:regId -- REG_ID - varchar(10)
+				  ,GETDATE() -- REG_DT - datetime
+				  ,:regId -- CHG_ID - varchar(10)
+				  ,GETDATE() -- CHG_DT - datetime
+				  ,:attType -- ATT_TYPE - varchar(50)
+				  ,:fileSize -- FILE_SIZE - varchar(50)
+				)
+		]]>
+		</query>
+		<parameter name="filePath" required="true"/>
+		<parameter name="fileName" required="false"/>
+		<parameter name="fileExtension" required="false"/>
+		<parameter name="fileType" required="false"/>
+		<parameter name="activeFlg" required="true"/>
+		<parameter name="attSourceCode" required="false"/>
+		<parameter name="userPicture" required="false"/>
+		<parameter name="regId" required="true"/>
+		<parameter name="attType" required="false"/>
+		<parameter name="fileSize" required="false"/>
+	</sql-service>
+	
+	<sql-service name="ATT.SQL_DELETE_TP_ATT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			DELETE FROM TP_ATT WHERE ATT_ID = :attId
+		]]>
+		</query>
+		<parameter name="attId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="ATT.SQL_FIND_TP_ATT_BY_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT * FROM TP_ATT WHERE ATT_ID = :ATT_ID
+		]]>
+		</query>
+		<parameter name="ATT_ID" required="true"/>
+	</sql-service>
+	
+	<sql-service name="ATT.SQL_FIND_TP_ATT_WHERE_IN_BY_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT * FROM TP_ATT WHERE ATT_ID IN(:attId)
+		]]>
+		</query>
+		<parameter name="attId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="ATT.SQL_FIND_ATTACHE_FILE_SEND_EMAIL" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT
+				 AT.*    
+			FROM	TP_REL_ATT RA											
+			LEFT OUTER JOIN TP_ATT AT ON RA.ATT_ID = AT.ATT_ID											
+			WHERE RA.SEND_DOC_FLG = 'Y' 
+			AND RA.REF_DOC_TYPE = 'ACT' 
+			AND RA.REF_DOC_NO = ${#actRefDocNo?.text}
+		]]>
+		</query>
+		<parameter name="actRefDocNo" required="true">:actRefDocNo</parameter>
+	</sql-service>
+	
+	
+	<sql-service name="ATT.SQL_IMPORT_CSV" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			bulk insert [dbo].[TB_TEMP_IMPORT]
+				${#FILE_LOCATION?.text} 
+				with 
+				(${#DEMITER_STRING?.text}, ${#NEWLINE_STRING?.text})
+				
+		]]>
+		</query>
+		<parameter name="FILE_LOCATION">from 'D:\customer.csv'</parameter>
+		<parameter name="DEMITER_STRING">fieldterminator = '|' </parameter>
+		<parameter name="NEWLINE_STRING">rowterminator = '\n'</parameter>
+	</sql-service>
+</query-collection>

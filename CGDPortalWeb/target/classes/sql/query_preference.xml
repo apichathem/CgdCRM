@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="PREF.FIND_BY_CRITERIA" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT P.*, E1.FIRST_NAME + ' ' + E1.LAST_NAME AS CREATE_BY, 
+            E2.FIRST_NAME + ' ' + E2.LAST_NAME AS UPDATE_BY
+			FROM TP_PREF P
+			LEFT OUTER JOIN TP_USR_MASTER R1 ON R1.[USER_ID] = P.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE E1 ON E1.EMP_ID = R1.EMP_ID
+      		LEFT OUTER JOIN TP_USR_MASTER R2 ON R2.[USER_ID] = P.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE E2 ON E2.EMP_ID = R2.EMP_ID
+			WHERE 1=1
+			${#prefName?.text}
+			${#prefValue?.text}
+		]]>
+		</query>
+		<parameter name="prefName"> AND PREF_NAME = :prefName</parameter>
+		<parameter name="prefValue"> AND PREF_VALUE = :prefValue</parameter>
+	</sql-service>
+	
+	<sql-service name="PREF.FIND_BY_ID" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT P.*, E1.FIRST_NAME + ' ' + E1.LAST_NAME AS CREATE_BY, 
+            E2.FIRST_NAME + ' ' + E2.LAST_NAME AS UPDATE_BY
+            --CONVERT(VARCHAR(10), P.REG_DT, 103) + ' '  + convert(VARCHAR(5), P.REG_DT, 14) AS CREATE_DATE,
+			--CONVERT(VARCHAR(10), P.CHG_DT, 103) + ' '  + convert(VARCHAR(5), P.CHG_DT, 14) AS UPDATE_DATE 
+			FROM TP_PREF P
+			LEFT OUTER JOIN TP_USR_MASTER R1 ON R1.[USER_ID] = P.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE E1 ON E1.EMP_ID = R1.EMP_ID
+      		LEFT OUTER JOIN TP_USR_MASTER R2 ON R2.[USER_ID] = P.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE E2 ON E2.EMP_ID = R2.EMP_ID
+			WHERE PREF_ID = :prefId
+		]]>
+		</query>
+		<parameter name="prefId" required="true" />
+	</sql-service>
+	
+	<sql-service name="PREF.FIND_BY_NAME" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT P.*, E1.FIRST_NAME + ' ' + E1.LAST_NAME AS CREATE_BY, 
+            E2.FIRST_NAME + ' ' + E2.LAST_NAME AS UPDATE_BY
+            --CONVERT(VARCHAR(10), P.REG_DT, 103) + ' '  + convert(VARCHAR(5), P.REG_DT, 14) AS CREATE_DATE,
+			--CONVERT(VARCHAR(10), P.CHG_DT, 103) + ' '  + convert(VARCHAR(5), P.CHG_DT, 14) AS UPDATE_DATE 
+			FROM TP_PREF P
+			LEFT OUTER JOIN TP_USR_MASTER R1 ON R1.[USER_ID] = P.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE E1 ON E1.EMP_ID = R1.EMP_ID
+      		LEFT OUTER JOIN TP_USR_MASTER R2 ON R2.[USER_ID] = P.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE E2 ON E2.EMP_ID = R2.EMP_ID
+			WHERE PREF_NAME = :prefName
+		]]>
+		</query>
+		<parameter name="prefName" required="true" />
+	</sql-service>
+	
+	<sql-service name="PREF.INSERT" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			INSERT INTO CGD_CRM_DB.dbo.TP_PREF
+			(PREF_NAME, PREF_VALUE, ETC1, ETC2, ETC3, DESCP, ENABLED_FLAG, REG_ID, REG_DT, CHG_ID, CHG_DT) 
+			VALUES (:prefName, :prefValue, :etc1, :etc2, :etc3, :descp, 'Y', :regId, GETDATE(), :regId, GETDATE())
+		]]>
+		</query>
+		<parameter name="prefName" required="true" />
+		<parameter name="prefValue" required="true" />
+		<parameter name="etc1" required="false" />
+		<parameter name="etc2" required="false" />
+		<parameter name="etc3" required="false" />
+		<parameter name="descp" required="false" />
+		<parameter name="regId" required="true" />
+		
+	</sql-service>
+	
+	<sql-service name="PREF.UPDATE" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			UPDATE CGD_CRM_DB.dbo.TP_PREF 
+			SET PREF_NAME = :prefName , 
+			PREF_VALUE = :prefValue, 
+			ETC1 = :etc1, 
+			ETC2 = :etc2, 
+			ETC3 = :etc3, 
+			DESCP = :descp, 
+			ENABLED_FLAG = :enabledFlag, 
+			CHG_ID = :chgId, 
+			CHG_DT = GETDATE() 
+			WHERE PREF_ID = :prefId
+		]]>
+		</query>
+		<parameter name="prefId" required="true" />
+		<parameter name="prefName" required="true" />
+		<parameter name="prefValue" required="true" />
+		<parameter name="enabledFlag" required="true" />
+		<parameter name="etc1" required="false" />
+		<parameter name="etc2" required="false" />
+		<parameter name="etc3" required="false" />
+		<parameter name="descp" required="false" />
+		<parameter name="chgId" required="true" />
+		
+	</sql-service>
+	
+</query-collection>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+  		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+      	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+      	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
+	<!-- <http pattern="/assets/**" security="none"/>
+	<http pattern="/css/**" security="none"/>
+	<http pattern="/js/**" security="none"/>
+	<http pattern="/service-rest/**" security="none"/>	
+	<http pattern="/images/**" security="none"/>
+	<http pattern="/index.jsp*" security="none"/>
+	<http pattern="/login.htm*" security="none"/>
+	<http pattern="/logout.htm*" security="none"/>
+	<http pattern="/exception.htm*" security="none"/>
+	<http pattern="/pagenotfound.htm*" security="none"/>
+	<http pattern="/invalidparam.htm*" security="none"/>
+	<http pattern="/notsupport.htm*" security="none"/>
+	<http pattern="/downloadFile.htm*" security="none"/>
+	<http pattern="/getImg.htm*" security="none"/>
+	<http pattern="/readFile.htm*" security="none"/>
+	<http pattern="/*.htm*" security="none"/> -->
+	
+	<http use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">		
+		<intercept-url pattern="/assets/**" access="permitAll"/>
+		<intercept-url pattern="/index.jsp*" access="permitAll"/>
+		<intercept-url pattern="/login.htm*" access="permitAll"/>
+		<intercept-url pattern="/logout.htm*" access="permitAll"/>
+		<intercept-url pattern="/download.htm*" access="permitAll"/>
+		<intercept-url pattern="/exception.htm*" access="permitAll"/>
+		<intercept-url pattern="/pagenotfound.htm*" access="permitAll"/>
+		<intercept-url pattern="/invalidparam.htm*" access="permitAll"/>
+		<intercept-url pattern="/notsupport.htm*" access="permitAll"/>		
+		<intercept-url pattern="/service-rest/getVersion.htm" access="permitAll"/>
+		<intercept-url pattern="/service-rest/login.htm" access="permitAll"/>
+		<intercept-url pattern="/service-rest/register.htm" access="permitAll"/>
+		<intercept-url pattern="/service-rest/forgetPassword.htm" access="permitAll"/>
+		<intercept-url pattern="/service-rest/adminForgetPassword.htm" access="permitAll"/>
+		<intercept-url pattern="/service-rest/email.htm" access="permitAll"/>
+		<intercept-url pattern="/report.htm" access="permitAll"/>
+		<intercept-url pattern="/downloadFile.htm*" access="permitAll"/>
+		<intercept-url pattern="/readFile.htm*" access="permitAll"/>
+		<intercept-url pattern="/**" access="isAuthenticated()"/>				
+		<custom-filter position="FORM_LOGIN_FILTER" ref="httpBridgeAuthenticaticationFilter" />		
+			<session-management invalid-session-url="/logout.htm">
+				<concurrency-control max-sessions="1" />
+			</session-management>
+		<logout delete-cookies="JSESSIONID" invalidate-session="true" logout-success-url="/login.htm" />
+	</http>	
+	
+	<!-- <http use-expressions="true">
+        <intercept-url pattern="/service-rest/**" access="isAuthenticated()"/>
+        <form-login login-page="/j_spring_security_login" default-target-url="/index.html" always-use-default-target="true" />
+        <session-management session-fixation-protection="none" />
+    </http> -->
+	
+	<beans:bean id="httpBridgeAuthenticaticationFilter" class="com.locus.jlo.web.security.HttpBridgeAuthenticationFilter" >	
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+	 	<beans:property name="authenticationFailureHandler" ref="failureLoginHandler" />
+	 	<beans:property name="authenticationSuccessHandler" ref="successLoginHandler" />	
+	</beans:bean>
+	
+	<beans:bean id="loginUrlAuthenticationEntryPoint" class="com.locus.jlo.web.security.LoginAuthenticationEntryPoint">
+ 		<beans:property name="loginFormUrl" value="/login.htm" />
+	</beans:bean>
+		
+ 	<beans:bean id="successLoginHandler" class="com.locus.jlo.web.security.SuccessLoginHandler" ></beans:bean>
+
+	<beans:bean id="failureLoginHandler" class="com.locus.jlo.web.security.FailureLoginHandler">
+	</beans:bean>
+	
+	<beans:bean id="httpBridgeAuthenticationProvider" class="com.locus.jlo.web.security.HttpBridgeAuthenticationProvider">
+		<beans:property name="userDetailsService" ref="userDetailService" ></beans:property>		
+	</beans:bean>
+	
+	<authentication-manager alias="authenticationManager">
+    	 <authentication-provider ref="httpBridgeAuthenticationProvider"></authentication-provider>
+  	</authentication-manager>
+
+</beans:beans>

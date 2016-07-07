@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+      
+    <bean id="selectorContainer" class="com.locus.jlo.web.util.SelectorContainer">
+        <property name="visibilitySelect">
+            <map>
+                <entry key="1" value="My Customer" />
+                <entry key="2" value="My Team Customer" />
+                <entry key="3" value="All Customer" />
+            </map>
+        </property>
+        <property name="monthSelect">
+            <map>
+                <entry key="1" value="January" />
+                <entry key="2" value="Febuary" />
+                <entry key="3" value="March" />
+                <entry key="4" value="April" />
+                <entry key="5" value="May" />
+                <entry key="6" value="June" />
+                <entry key="7" value="July" />
+                <entry key="8" value="August" />
+                <entry key="9" value="September" />
+                <entry key="10" value="October" />
+                <entry key="11" value="November" />
+                <entry key="12" value="December" />
+            </map>
+        </property>
+        <property name="categoryCodeSelect">
+            <map>
+                <entry key="1" value="Code Type" />
+                <entry key="2" value="Code Name" />
+            </map>
+        </property>
+        <property name="useYnSelect">
+            <map>
+                <entry key="1" value="Total" />
+                <entry key="2" value="Yes" />
+                <entry key="3" value="No" />
+            </map>
+        </property>
+        <property name="ynSelect">
+            <map>
+                <entry key="Y" value="Yes" />
+                <entry key="N" value="No" />
+            </map>
+        </property>
+    </bean>
+</beans>

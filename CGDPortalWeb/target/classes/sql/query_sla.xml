@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="SLA.GET_SLA_BY_CRITERIA" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT s.*, cb1.CODE_NAME AS SLA_UOM_NAME, cb2.CODE_NAME AS STATUS_NAME
+			FROM TP_SLA s
+			LEFT OUTER JOIN TP_CODEBOOK_LANG cb1 ON cb1.CODE_TYPE='SLA_UOM' AND cb1.CODE_ID = s.SLA_UOM_CD AND cb1.LANG_CD = :langCd
+			LEFT OUTER JOIN TP_CODEBOOK_LANG cb2 ON cb2.CODE_TYPE='SLA_STATUS' AND cb2.CODE_ID = s.STATUS_CD AND cb2.LANG_CD = :langCd
+			WHERE 1=1
+			${#slaName?.text}
+		]]>
+		</query>
+		<parameter name="langCd" required="true"/>
+		<parameter name='slaName' prefix="%" suffix="%"> AND SLA_NAME like :slaName</parameter>
+	
+	</sql-service>
+	
+	<sql-service name="SLA.GET_SLA_BY_ID" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT s.* , e1.FIRST_NAME + ' '+ e1.LAST_NAME AS CREATE_BY
+				, e2.FIRST_NAME + ' '+ e2.LAST_NAME AS UPDATE_BY
+			FROM TP_SLA s
+			LEFT OUTER JOIN TP_USR_MASTER u1 ON u1.[USER_ID] = s.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE e1 ON e1.EMP_ID = u1.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER u2 ON u2.[USER_ID] = s.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE e2 ON e2.EMP_ID = u2.EMP_ID
+			WHERE SLA_ID = :slaId
+		]]>
+		</query>
+		<parameter name="slaId" required="true"/>
+	
+	</sql-service>
+	
+	<sql-service name="SLA.GET_SLA_ID_BY_CONTENT_CAT_ID" type="named-parameter" showSql="true">
+		<description>For get SLA ID By content cat5 </description>		
+		<query><![CDATA[	
+			 SELECT
+			   sla.SLA_ID 
+			  ,sla.SLA_UNIT
+			  ,sla.SLA_NAME
+			FROM TP_KB_CONTENT_CAT5 cat
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat.SLA_ID AND sla.STATUS_CD = '01'
+			WHERE cat.CONTENT_CAT_ID = :contentCatId		 
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	
+	</sql-service>
+	
+	
+	
+	<sql-service name="SLA.UPDATE" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			UPDATE TP_SLA SET 
+				SLA_NAME = :slaName, 
+				SLA_UNIT = :slaUnit, 
+				SLA_UOM_CD = :slaUomCd, 
+				STATUS_CD = :statusCd, 
+				DESCP = :descp,
+				CHG_ID = :chgId, 
+				CHG_DT = GETDATE() 
+			WHERE SLA_ID = :slaId
+		]]>
+		</query>
+		<parameter name="slaName" required="true"/>
+		<parameter name="slaUnit" required="true"/>
+		<parameter name="slaUomCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="chgId" required="true"/>
+		<parameter name="slaId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="SLA.INSERT" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			UPDATE TP_SLA SET 
+				SLA_NAME = :slaName, 
+				SLA_UNIT = :slaUnit, 
+				SLA_UOM_CD = :slaUomCd, 
+				STATUS_CD = :statusCd, 
+				DESCP = :descp,
+				REG_ID = :regId,
+				REG_DT = GETDATE(),
+				CHG_ID = :regId, 
+				CHG_DT = GETDATE() 
+			WHERE SLA_ID = :slaId
+		]]>
+		</query>
+		<parameter name="slaName" required="true"/>
+		<parameter name="slaUnit" required="true"/>
+		<parameter name="slaUomCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="regId" required="true"/>
+		<parameter name="slaId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="SLA.GET_SLA_LIST" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT * FROM TP_SLA
+			WHERE STATUS_CD = '01'
+		]]>
+		</query>
+	
+	</sql-service>
+	
+</query-collection>

@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="CONTENT.SQL_FIND_LIST_CONTENT_BY_CAT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT 
+				C.CONTENT_NUMBER, C.CONTENT_CAT_ID, C.REF_ID, C.[TYPE], 
+				C.TITLE, C.SUMMARY, C.CONNECT_ID, C.CONNECT_STATUS, 
+				C.USE_STATUS, C.AGT_LEVEL, C.DISPLAY, C.ORD, 
+				C.SEND_MAIL_DOC_FLAG, C.START_DT, C.END_DT, 
+				C.REG_ID, C.REG_DT, C.CHG_ID, C.CHG_DT, A.AREA, (CASE C.CONTENT_CAT_ID WHEN 311 THEN A.AREA ELSE P.CAT_NAME END) AS PARENT
+			FROM TP_CONTENT C
+			LEFT OUTER JOIN TP_CONTENT_ADDR A ON C.CONTENT_NUMBER = A.CONTENT_ID			
+			LEFT OUTER JOIN TP_CONTENT_CAT P ON C.CONTENT_CAT_ID = P.CONTENT_CAT_ID
+			WHERE C.CONTENT_CAT_ID = :CONTENT_CAT_ID
+			${#TITLE?.text}
+			${#ownerGroup?.text}
+			
+			ORDER BY C.ORD ASC
+		]]>
+		</query>
+		<parameter name="CONTENT_CAT_ID" required="true"/>
+		<parameter name="TITLE" prefix="%" suffix="%"> AND C.TITLE like :TITLE </parameter>
+		<parameter name="ownerGroup"> AND C.REG_ID IN :ownerGroup </parameter>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_BY_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT 
+				C.CONTENT_NUMBER, C.CONTENT_CAT_ID, C.REF_ID, C.[TYPE], 
+				C.TITLE, C.SUMMARY, C.CONNECT_ID, C.CONNECT_STATUS, 
+				C.USE_STATUS, C.AGT_LEVEL, C.DISPLAY, C.ORD, 
+				C.SEND_MAIL_DOC_FLAG, C.START_DT, C.END_DT, 
+				C.REG_ID, C.REG_DT, C.CHG_ID, C.CHG_DT, (CASE C.CONTENT_CAT_ID WHEN 311 THEN A.AREA ELSE P.CAT_NAME END) AS PARENT,
+				R.FIRST_NAME+' '+R.LAST_NAME AS REG_BY,
+				U.FIRST_NAME+' '+U.LAST_NAME AS CHG_BY
+			FROM TP_CONTENT C
+			LEFT OUTER JOIN TP_CONTENT_ADDR A ON C.CONTENT_NUMBER = A.CONTENT_ID
+			LEFT OUTER JOIN TP_CONTENT_CAT P ON C.CONTENT_CAT_ID = P.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_EMPLOYEE R ON C.REG_ID=R.EMP_ID
+			LEFT OUTER JOIN TP_EMPLOYEE U ON C.CHG_ID=U.EMP_ID 
+			WHERE C.CONTENT_NUMBER =  :CONTENT_NUMBER 
+		]]>
+		</query>
+		<parameter name="CONTENT_NUMBER" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_ADDR_BY_CONTENT_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT A.CONTENT_ADDR_ID, A.CONTENT_ID, A.DESCP, 
+				A.HOUSE_NO, A.MOO, A.BUILDING, A.SOI, A.ROAD, 
+				A.CITY, A.DISTRICT, A.PROVINCE, A.POSTAL_CD, 
+				A.AREA, A.TEL_NO_1, A.TEL_NO_2, A.TEL_NO_3, 
+				A.FAX_NO_1, A.FAX_NO_2, A.LAT_LNG, A.CHG_ID, A.CHG_DT, U.FIRST_NAME+' '+U.LAST_NAME AS CHG_BY
+			FROM TP_CONTENT_ADDR A
+			LEFT OUTER JOIN TP_EMPLOYEE U ON A.CHG_ID=U.EMP_ID 
+			WHERE A.CONTENT_ID = :CONTENT_ID 
+		]]>
+		</query>
+		<parameter name="CONTENT_ID" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_CAT_BY_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT 
+				CONTENT_CAT_ID, CONTENT_TYPE, CAT_NAME, 
+				DISPLAY, ORD, PAR_CAT_ID, CAT_TYPE, 
+				CAT_SUBTYPE, CAT_CENTER_TYPE, USE_STATUS, 
+				C.REG_ID, C.REG_DT, C.CHG_ID, C.CHG_DT, 
+				R.FIRST_NAME+' '+R.LAST_NAME AS REG_BY,
+				U.FIRST_NAME+' '+U.LAST_NAME AS CHG_BY
+			FROM TP_CONTENT_CAT C
+			LEFT OUTER JOIN TP_EMPLOYEE R ON C.REG_ID=R.EMP_ID
+			LEFT OUTER JOIN TP_EMPLOYEE U ON C.CHG_ID=U.EMP_ID 
+			WHERE C.CONTENT_CAT_ID = :CONTENT_CAT_ID
+		]]>
+		</query>
+		<parameter name="CONTENT_CAT_ID" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_COUNT_CONTENT_BY_CONTENT_CAT_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT COUNT(1)
+			FROM TP_CONTENT
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_COUNT_CONTENT_CAT_BY_PAR_CAT_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT COUNT(1)
+			FROM TP_CONTENT_CAT
+			WHERE PAR_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_CAT_BY_TYPE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT C.CONTENT_CAT_ID, C.CAT_NAME, C.USE_STATUS
+			FROM TP_CONTENT_CAT C
+			WHERE CONTENT_TYPE = :CONTENT_TYPE
+		]]>
+		</query>
+		<parameter name="CONTENT_TYPE" required="true"/>
+	</sql-service>
+	
+	
+
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_KEYWORD_BY_CONTENT_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT KEY_ID, KEYWORD
+			FROM TP_CONTENT_KEYWORD
+			WHERE CONTENT_ID=:CONTENT_ID
+			ORDER BY KEY_ID ASC
+		]]>
+		</query>
+		<parameter name="CONTENT_ID" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_INSERT_CONTENT_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			INSERT INTO TP_CONTENT_KEYWORD (
+			   CONTENT_ID
+			  ,KEYWORD
+			  ,REG_ID
+			  ,REG_DT
+			) VALUES( 
+			   :CONTENT_ID             -- CONTENT_ID - varchar(20)
+			  ,:KEYWORD                -- KEYWORD - varchar(100)
+			  ,:REG_ID                 -- REG_ID - varchar(20)
+			  ,:REG_DT                 -- REG_DT - datetime
+			)
+		]]>
+		</query>
+		<parameter name="CONTENT_ID" required="true"/>
+		<parameter name="KEYWORD" required="true"/>
+		<parameter name="REG_ID" required="true"/>
+		<parameter name="REG_DT" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_DELETE_CONTENT_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			DELETE FROM TP_CONTENT_KEYWORD
+			WHERE CONTENT_ID=:CONTENT_ID AND KEYWORD=:KEYWORD
+		]]>
+		</query>
+		<parameter name="CONTENT_ID" required="true"/>
+		<parameter name="KEYWORD" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT_ADDR_LATLNG" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			UPDATE TP_CONTENT_ADDR SET LAT_LNG = :LAT_LNG
+			WHERE CONTENT_ID = :CONTENT_ID 
+		]]>
+		</query>
+		<parameter name="CONTENT_ID" required="true"/>
+		<parameter name="LAT_LNG" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_ATT_BY_CONTENT_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT C.CONTENT_ATT_ID,
+			         C.CONTENT_ID, 
+			         R.TITLE AS CONTENT_TITLE, 
+			         C.TITLE,A.FILE_PATH,
+			         A.FILE_NAME,
+			         MAIN_FLAG,
+			         C.REG_ID,
+			         CONVERT(VARCHAR(10), C.REG_DT, 103)+' '+SUBSTRING(CONVERT(VARCHAR(12), C.REG_DT, 114),0,9) AS REG_DT_TEXT,
+			         U.FIRST_NAME+' '+U.LAST_NAME AS REG_BY, 
+			         C.ATT_ID, 
+			         C.DESCP,
+			         CONVERT(VARCHAR(10), C.CHG_DT, 103)+' '+SUBSTRING(CONVERT(VARCHAR(12), C.CHG_DT, 114),0,9) AS CHG_DT_TEXT,
+			         H.FIRST_NAME+' '+H.LAST_NAME AS CHG_BY, 
+			         A.FILE_TYPE
+			FROM TP_KB_CONTENT_ATT C
+			INNER JOIN TP_KB_CONTENT R ON C.CONTENT_ID=R.CONTENT_ID
+			INNER JOIN TP_ATT A ON C.ATT_ID = A.ATT_ID
+			LEFT OUTER JOIN TP_USR_MASTER REG ON REG.[USER_ID] = C.REG_ID
+			LEFT JOIN TP_EMPLOYEE U ON REG.EMP_ID = U.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER CHG ON CHG.[USER_ID] = C.CHG_ID
+			LEFT JOIN TP_EMPLOYEE H ON CHG.EMP_ID = H.EMP_ID
+			WHERE R.CONTENT_ID = :CONTENT_ID
+			${#DOC_NAME?.text}
+		]]>
+		</query>
+		<parameter name="CONTENT_ID" required="true"/>
+		<parameter name="DOC_NAME" prefix="%" suffix="%"> AND C.TITLE like :DOC_NAME </parameter>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_INSERT_CONTENT_ATT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			INSERT INTO TP_KB_CONTENT_ATT
+		           (ATT_ID
+		           ,CONTENT_ID
+		           ,TITLE
+		           ,DESCP
+		           ,MAIN_FLAG
+		           ,SEND_DOC_TYPE_FLAG
+		           ,ATT_TYPE_FLAG
+		           ,REG_ID
+		           ,REG_DT
+		           ,CHG_ID
+		           ,CHG_DT)
+		     VALUES(
+		           :attId
+		           ,:contentId
+		           ,:title
+		           ,:descp
+		           ,:mainFlag
+		           ,:sendDocTypeFlag
+		           ,:attTypeFlag
+		           ,:regId
+		           ,GETDATE()
+		           ,:regId
+		           ,GETDATE()
+		           )
+		]]>
+		</query>
+		<parameter name="attId" required="true"/>
+		<parameter name="contentId" required="true"/>
+		<parameter name="title" required="true"/>
+		<parameter name="descp" required="false"/>
+		<parameter name="mainFlag" required="false"/>
+		<parameter name="sendDocTypeFlag" required="false"/>
+		<parameter name="attTypeFlag" required="false"/>
+		<parameter name="regId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_DELETE_CONTENT_ATT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			DELETE FROM TP_KB_CONTENT_ATT WHERE CONTENT_ATT_ID = :contentAttId
+		]]>
+		</query>
+		<parameter name="contentAttId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT_ATT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_ATT 
+			  SET 
+			    TITLE=:title, 
+			    DESCP=:descp, 
+			    MAIN_FLAG=:mainFlag, 
+			    SEND_DOC_TYPE_FLAG=:sendDocTypeFlag, 
+			    ATT_TYPE_FLAG=:attTypeFlag, 
+			    CHG_ID=:chgId, 
+			    CHG_DT=GETDATE()
+			  WHERE CONTENT_ATT_ID = :contentAttId
+		]]>
+		</query>
+		<parameter name="contentAttId" required="true"/>
+		<parameter name="title" required="true"/>
+		<parameter name="descp" required="false"/>
+		<parameter name="mainFlag" required="false"/>
+		<parameter name="sendDocTypeFlag" required="false"/>
+		<parameter name="attTypeFlag" required="false"/>
+		<parameter name="chgId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT_ATT_MAIN_FLG_NULL" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_ATT 
+			  SET 
+			    MAIN_FLAG=NULL, 
+			    CHG_ID=:chgId, 
+			    CHG_DT=:chgDt
+			  WHERE CONTENT_ID = :contentId
+		]]>
+		</query>
+		<parameter name="contentId" required="true"/>
+		<parameter name="chgId" required="true"/>
+		<parameter name="chgDt" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_CAT_BY_PARENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			select CONTENT_CAT_ID, CAT_NAME, PAR_CAT_ID 
+			FROM TP_CONTENT_CAT 
+			WHERE PAR_CAT_ID=:PAR_CAT_ID
+		]]>
+		</query>
+		<parameter name="PAR_CAT_ID" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_CAT_BY_CONTENT_TYPE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			select CONTENT_CAT_ID, CAT_NAME, PAR_CAT_ID, ORD, USE_STATUS, DISPLAY
+			FROM TP_CONTENT_CAT 
+			WHERE CONTENT_TYPE=:CONTENT_TYPE
+			
+			${#ownerGroup?.text}
+			ORDER BY PAR_CAT_ID ASC, ORD ASC
+		]]>
+		</query>
+		<parameter name="CONTENT_TYPE" required="true"/>
+		<parameter name="ownerGroup"> AND REG_ID IN :ownerGroup </parameter>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_INSERT_CONTENT_CAT" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			insert into TP_CONTENT_CAT (
+				 CONTENT_TYPE
+				,CAT_NAME
+				,DISPLAY
+				,ORD
+				,PAR_CAT_ID
+				,CAT_TYPE
+				,CAT_SUBTYPE
+				,CAT_CENTER_TYPE
+				,USE_STATUS
+				,REG_ID
+				,REG_DT
+			) VALUES (
+				 :contentType  -- CONTENT_TYPE - varchar(6)
+				,:catName -- CAT_NAME - nvarchar(200)
+				,:display -- DISPLAY - varchar(25)
+				,:ord -- ORD - int
+				,:parCatId -- PAR_CAT_ID - int
+				,:catType -- CAT_TYPE - varchar(6)
+				,:catSubtype -- CAT_SUBTYPE - varchar(6)
+				,:catCenterType -- CAT_CENTER_TYPE - varchar(6)
+				,:useStatus -- USE_STATUS - varchar(6)
+				,:regId -- REG_ID - varchar(10)
+				,:regDt -- REG_DT - datetime
+			)
+		]]>
+		</query>
+		<parameter name="contentType" required="false"/>
+		<parameter name="catName" required="false"/>
+		<parameter name="display" required="false"/>
+		<parameter name="ord" required="false"/>
+		<parameter name="parCatId" required="false"/>
+		<parameter name="catType" required="false"/>
+		<parameter name="catSubtype" required="false"/>
+		<parameter name="catCenterType" required="false"/>
+		<parameter name="useStatus" required="false"/>
+		<parameter name="regId" required="false"/>
+		<parameter name="regDt" required="false"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT_CAT" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			UPDATE TP_CONTENT_CAT SET
+			   CONTENT_TYPE = :contentType -- varchar(6)
+			  ,CAT_NAME = :catName -- nvarchar(200)
+			  ,DISPLAY = :display -- varchar(25)
+			  ,ORD = :ord -- int
+			  ,PAR_CAT_ID = :parCatId -- int
+			  ,CAT_TYPE = :catType -- varchar(6)
+			  ,CAT_SUBTYPE = :catSubtype -- varchar(6)
+			  ,CAT_CENTER_TYPE = :catCenterType -- varchar(6)
+			  ,USE_STATUS = :useStatus -- varchar(6)
+			  ,CHG_ID = :chgId -- varchar(10)
+			  ,CHG_DT = :chgDt -- datetime
+			WHERE CONTENT_CAT_ID = :contentCatId -- int
+		]]>
+		</query>
+		<parameter name="contentType" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="display" required="true"/>
+		<parameter name="ord" required="true"/>
+		<parameter name="parCatId" required="true"/>
+		<parameter name="catType" required="true"/>
+		<parameter name="catSubtype" required="false"/>
+		<parameter name="catCenterType" required="true"/>
+		<parameter name="useStatus" required="true"/>
+		<parameter name="chgId" required="true"/>
+		<parameter name="chgDt" required="true"/>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_DELETE_CONTENT_CAT" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			DELETE FROM TP_CONTENT_CAT 
+			WHERE CONTENT_CAT_ID = :contentCatId -- int
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_INSERT_CONTENT" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			INSERT INTO TP_CONTENT
+		           (CONTENT_NUMBER
+		           ,CONTENT_CAT_ID
+		           ,REF_ID
+		           ,TYPE
+		           ,TITLE
+		           ,SUMMARY
+		           ,CONNECT_ID
+		           ,CONNECT_STATUS
+		           ,USE_STATUS
+		           ,AGT_LEVEL
+		           ,DISPLAY
+		           ,ORD
+		           ,SEND_MAIL_DOC_FLAG
+		           ,START_DT
+		           ,END_DT
+		           ,REG_ID
+		           ,REG_DT)
+		     VALUES
+		           (:contentNumber
+		           ,:contentCatId
+		           ,:refId
+		           ,:type
+		           ,:title
+		           ,:summary
+		           ,:connectId
+		           ,:connectStatus
+		           ,:useStatus
+		           ,:agtLevel
+		           ,:display
+		           ,:ord
+		           ,:sendMailDocFlag
+		           ,:startDt
+		           ,:endDt
+		           ,:regId
+		           ,:regDt)
+		]]>
+		</query>
+		<parameter name="contentNumber" required="true"/>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="refId" required="false"/>
+		<parameter name="type" required="false"/>
+		<parameter name="title" required="true"/>
+		<parameter name="summary" required="false"/>
+		<parameter name="connectId" required="false"/>
+		<parameter name="connectStatus" required="false"/>
+		<parameter name="useStatus" required="false"/>
+		<parameter name="agtLevel" required="false"/>
+		<parameter name="display" required="false"/>
+		<parameter name="ord" required="false"/>
+		<parameter name="sendMailDocFlag" required="false"/>
+		<parameter name="startDt" required="false"/>
+		<parameter name="endDt" required="false"/>
+		<parameter name="regId" required="false"/>
+		<parameter name="regDt" required="false"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			update TP_CONTENT SET
+			  CONTENT_CAT_ID = :contentCatId -- int
+			  ,REF_ID = :refId -- varchar(20)
+			  ,TYPE = :type -- varchar(6)
+			  ,TITLE = :title -- varchar(200)
+			  ,CONNECT_ID = :connectId -- varchar(10)
+			  ,CONNECT_STATUS = :connectStatus -- varchar(6)
+			  ,USE_STATUS = :useStatus -- varchar(6)
+			  ,AGT_LEVEL = :agtLevel -- varchar(6)
+			  ,DISPLAY = :display -- varchar(6)
+			  ,ORD = :ord -- int
+			  ,SEND_MAIL_DOC_FLAG = :sendMailDocFlag -- char(1)
+			  ,START_DT = :startDt -- datetime
+			  ,END_DT = :endDt -- datetime
+			  ,CHG_ID = :chgId -- varchar(10)
+			  ,CHG_DT = :chgDt -- datetime
+			WHERE CONTENT_NUMBER = :contentNumber -- varchar(20)
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="refId" required="false"/>
+		<parameter name="type" required="false"/>
+		<parameter name="title" required="true"/>
+		<parameter name="connectId" required="false"/>
+		<parameter name="connectStatus" required="false"/>
+		<parameter name="useStatus" required="false"/>
+		<parameter name="agtLevel" required="false"/>
+		<parameter name="display" required="false"/>
+		<parameter name="ord" required="false"/>
+		<parameter name="sendMailDocFlag" required="false"/>
+		<parameter name="startDt" required="false"/>
+		<parameter name="endDt" required="false"/>
+		<parameter name="chgId" required="false"/>
+		<parameter name="chgDt" required="false"/>
+		<parameter name="contentNumber" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT_SUMMARY" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			update TP_CONTENT SET
+			  SUMMARY = :summary -- varchar(2500)
+			WHERE CONTENT_NUMBER = :contentNumber -- varchar(20)
+		]]>
+		</query>
+		<parameter name="summary" required="false"/>
+		<parameter name="contentNumber" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_DELETE_CONTENT" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			DELETE FROM TP_CONTENT 
+			WHERE CONTENT_NUMBER = :contentNumber -- int
+		]]>
+		</query>
+		<parameter name="contentNumber" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CONTENT.SQL_UPDATE_CONTENT_ADDR" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			update TP_CONTENT_ADDR 
+			SET 
+				HOUSE_NO=:houseNo, 
+				MOO=:moo, 
+				BUILDING=:building, 
+				SOI=:soi,
+				ROAD=:road, 
+				CITY=:city, 
+				DISTRICT=:district, 
+				PROVINCE=:province, 
+				POSTAL_CD=:postalCd, 
+				AREA=:area, 
+				TEL_NO_1=:telNo1, 
+				TEL_NO_2=:telNo2, 
+				TEL_NO_3=:telNo3, 
+				FAX_NO_1=:faxNo1, 
+				FAX_NO_2=:faxNo2, 
+				CHG_ID=:chgId, 
+				CHG_DT=:chgDt
+			where CONTENT_ID=:contentId
+		]]>
+		</query>
+		<parameter name="contentId" required="true"/>
+		<parameter name="houseNo" required="false"/>
+		<parameter name="moo" required="false"/>
+		<parameter name="building" required="false"/>
+		<parameter name="soi" required="false" />
+		<parameter name="road" required="false"/>
+		<parameter name="city" required="false"/>
+		<parameter name="district" required="false"/>
+		<parameter name="province" required="false"/>
+		<parameter name="postalCd" required="false"/>
+		<parameter name="area" required="false"/>
+		<parameter name="telNo1" required="false"/>
+		<parameter name="telNo2" required="false"/>
+		<parameter name="telNo3" required="false"/>
+		<parameter name="faxNo1" required="false"/>
+		<parameter name="faxNo2" required="false"/>
+		<parameter name="chgId" required="false"/>
+		<parameter name="chgDt" required="false"/>
+		
+	</sql-service>
+	<sql-service name="CONTENT.SQL_FIND_CONTENT_FOR_ATT_DIALOG" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			select DISTINCT C.CONTENT_NUMBER, C.TITLE from TP_CONTENT C
+			inner join TP_KB_CONTENT_ATT A ON C.CONTENT_NUMBER=A.CONTENT_ID
+			WHERE 1=1 
+			${#type?.text} 
+			${#name?.text} 
+			${#docname?.text} 
+		]]>
+		</query>
+		<parameter name="type"> AND C.TYPE = ISNULL(:type,C.TYPE) </parameter>
+		<parameter name="name" prefix="%" suffix="%"> AND C.TITLE like :name </parameter>
+		<parameter name="docname" prefix="%" suffix="%"> AND A.TITLE like :docname </parameter>
+	</sql-service>
+</query-collection>

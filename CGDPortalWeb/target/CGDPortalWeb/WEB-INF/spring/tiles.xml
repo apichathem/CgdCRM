@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+	<!-- Only import stylesheet and javascript -->
+	<definition name="layoutOther" template="/WEB-INF/layout/layout_other.jsp">
+		<put-attribute name="header" value="" />
+		<put-attribute name="nav" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+	<!-- Only import stylesheet and javascript -->
+	<definition name="layoutDlg" template="/WEB-INF/layout/layout_dialog.jsp">
+		<put-attribute name="header" value="" />
+		<put-attribute name="nav" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+	<!-- Only login page -->
+	<definition name="layoutLogin" template="/WEB-INF/layout/layout_login.jsp">
+		<put-attribute name="header" value="" />
+		<put-attribute name="nav" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+	<!-- With header and menu -->
+	<definition name="layoutBase" template="/WEB-INF/layout/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+	<definition name="layoutTab" template="/WEB-INF/layout/layout_tab.jsp">
+		<put-attribute name="header" value="" />
+		<put-attribute name="nav" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+	<definition name="layoutModal" template="/WEB-INF/layout/layout_modal_form.jsp">
+		<put-attribute name="header" value="" />
+		<put-attribute name="nav" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="" />
+	</definition>
+
+
+	<definition name="home" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/home/home.jsp" />
+	</definition>
+	<definition name="myTask" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/home/myTasks.jsp" />
+	</definition>
+
+	<definition name="login" extends="layoutLogin">
+		<put-attribute name="body" value="/WEB-INF/login.jsp" />
+	</definition>
+
+	<definition name="service-rest" extends="layoutLogin">
+		<put-attribute name="body" value="/WEB-INF/service-rest.jsp" />
+	</definition>
+
+	<definition name="download" extends="layoutLogin">
+		<put-attribute name="body" value="/WEB-INF/download.jsp" />
+	</definition>
+
+	<!-- exception -->
+	<definition name="exception" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/exception.jsp" />
+	</definition>
+	<!-- "exception" -->
+
+	<!-- pagenotfound -->
+	<definition name="pagenotfound" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/pagenotfound.jsp" />
+	</definition>
+	<!-- "pagenotfound" -->
+
+	<!-- invalidparam -->
+	<definition name="invalidparam" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/invalidparam.jsp" />
+	</definition>
+	<!-- "invalidparam" -->
+
+	<!-- notauthorized -->
+	<definition name="notauthorized" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/notauthorized.jsp" />
+	</definition>
+	<!-- "notauthorized" -->
+
+	<!-- notsupport -->
+	<definition name="notsupport" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/notsupport.jsp" />
+	</definition>
+	<!-- "notsupport" -->
+
+
+
+	<!-- /WEB-INF/view/kb -->
+	<definition name="knowledgeBase" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/knowledgeBase.jsp" />
+	</definition>
+	<definition name="knowledgeBaseDetail" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/knowledgeBaseDetail.jsp" />
+	</definition>
+	<definition name="knowledgeBaseApproval" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/knowledgeBaseApproval.jsp" />
+	</definition>
+	<definition name="importKnowledgeBase" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/importKnowledgeBase.jsp" />
+	</definition>
+	<definition name="exportKnowledgeBase" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/exportKnowledgeBase.jsp" />
+	</definition>
+	
+	
+	<!-- Begin System Module -->
+	<definition name="codebookManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/codebookManagement.jsp" />
+	</definition>
+	<definition name="userManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/userManagement.jsp" />
+	</definition>
+	<definition name="userAssignment" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/userAssignment.jsp" />
+	</definition>
+	<definition name="userDetailManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/userDetailManagement.jsp" />
+	</definition>
+	<definition name="changePassword" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/profile/changePassword.jsp" />
+	</definition>
+	<definition name="roleManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/roleManagement.jsp" />
+	</definition>
+	<definition name="rolePrivilege" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/rolePrivilege.jsp" />
+	</definition>
+	<definition name="roleDetail" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/roleDetail.jsp" />
+	</definition>
+	<definition name="menuManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/menuManagement.jsp" />
+	</definition>
+	<definition name="menuDetail" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/menuDetail.jsp" />
+	</definition>
+	<definition name="loginHistory" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/loginHistory.jsp" />
+	</definition>
+	<definition name="holidayManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/holidayManagement.jsp" />
+	</definition>
+	<definition name="preferenceManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/preferenceManagement.jsp" />
+	</definition>
+	<definition name="slaManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/slaManagement.jsp" />
+	</definition>
+	<definition name="slaDeatil" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/slaDetail.jsp" />
+	</definition>
+	<!-- End System Module -->
+
+	<definition name="activityScoresManagement" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/activityScoresManagement.jsp" />
+	</definition>
+	<definition name="activityScoresDetail" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/system/activityScoresDetail.jsp" />
+	</definition>
+
+	<!-- <definition name="selfIntroduction" extends="layoutBase"> <put-attribute name="body" value="/WEB-INF/view/agent/selfIntroduction.jsp"/> </definition> -->
+
+	<definition name="companyIntroduction" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/agent/companyIntroduction.jsp" />
+	</definition>
+
+	<definition name="planSpec" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/planSpec.jsp" />
+	</definition>
+
+	<definition name="informKnowledge" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/kb/informKnowledge.jsp" />
+	</definition>
+
+	<!-- End System Module -->
+
+	<!-- RISK -->
+	<!-- <definition name="risk1" extends="layoutBase"> <put-attribute name="body" value="/WEB-INF/view/risk/risk1.jsp"/> </definition> <definition name="riskbysegment" extends="layoutBase"> <put-attribute 
+		name="body" value="/WEB-INF/view/risk/riskBySegment.jsp"/> </definition> -->
+	<!-- END RISK -->
+
+	<!-- Premium -->
+	<!-- <definition name="premiumrate" extends="layoutBase"> <put-attribute name="body" value="/WEB-INF/view/premium/premiumRate.jsp"/> </definition> <definition name="insuranceadvice" extends="layoutBase"> 
+		<put-attribute name="body" value="/WEB-INF/view/premium/insureAdvice.jsp"/> </definition> -->
+	<!-- End Premium -->
+
+
+	<definition name="redirect" extends="layoutOther">
+		<put-attribute name="body" value="/WEB-INF/redirect.jsp" />
+	</definition>
+
+	<!-- Begin Modal UI Page -->
+	<definition name="departmentDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/departmentDialog.jsp" />
+	</definition>
+
+	<definition name="userDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/userDialog.jsp" />
+	</definition>
+	
+	<definition name="userRoleDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/userRoleDialog.jsp" />
+	</definition>
+	
+	<definition name="roleDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/roleDialog.jsp" />
+	</definition>
+
+	<definition name="kbAttDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/kbAttDialog.jsp" />
+	</definition>
+
+	<definition name="createContactDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/customer/createContactDialog.jsp" />
+	</definition>
+
+	<definition name="codebookDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/system/codebookDialog.jsp" />
+	</definition>
+	
+	<definition name="iconDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/system/iconDialog.jsp" />
+	</definition>
+	
+	<definition name="categoryDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/categoryDialog.jsp" />
+	</definition>
+
+	<definition name="attDocInfoDetailDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/attDocDetailDialog.jsp" />
+	</definition>
+	
+	<definition name="contactDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/contactDialog.jsp" />
+	</definition>
+	
+	<definition name="addressDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/addressDialog.jsp" />
+	</definition>
+	
+	<definition name="consultingDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/consultingDialog.jsp" />
+	</definition>
+	
+	<definition name="contactConsultingDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/consulting/contactConsultingDialog.jsp" />
+	</definition>
+	
+	<definition name="createContactConsultingDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/consulting/createContactConsultingDialog.jsp" />
+	</definition>
+	
+	<definition name="customerAddressDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/customer/addressDialog.jsp" />
+	</definition>
+	
+	<definition name="createAddressDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/customer/createAddressDialog.jsp" />
+	</definition>
+	
+	<definition name="customerDialog" extends="layoutModal">
+		<put-attribute name="body" value="/WEB-INF/view/modal/customerDialog.jsp" />
+	</definition>
+	
+    <definition name="customerContactDialog" extends="layoutModal">
+        <put-attribute name="body" value="/WEB-INF/view/customer/contactDialog.jsp"/>
+    </definition>
+    
+     <definition name="relationDialog" extends="layoutModal">
+        <put-attribute name="body" value="/WEB-INF/view/customer/relationDialog.jsp"/>
+    </definition>
+	<!-- End Modal UI Page -->
+
+	<!-- Begin Branch UI Pahe -->
+	<definition name="branch" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/branch/branch.jsp" />
+	</definition>
+	<!-- End Branch UI Page -->
+
+	<!-- Begin Service Request Module -->
+	<definition name="serviceRequestList" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/sr/serviceRequestList.jsp" />
+	</definition>
+
+	<definition name="serviceRequestDetailMain" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/sr/serviceRequestDetailMain.jsp" />
+	</definition>
+	<!-- Tab Activity -->
+	<definition name="serviceRequestActivity" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/sr/serviceRequestActivityPage.jsp" />
+	</definition>
+
+	<!-- Tab More Info -->
+
+	<definition name="serviceRequestSolutions" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/sr/serviceRequestSolutionPage.jsp" />
+	</definition>
+	
+	<!-- End Service Request Module -->
+	<!-- Begin Customer Module -->
+	<definition name="customerMain" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerMain.jsp" />
+	</definition>
+
+	<definition name="customerIndividualDetail" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerIndividualDetail.jsp" />
+	</definition>
+
+	<definition name="customerCorporateDetail" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerCorporateDetail.jsp" />
+	</definition>
+
+	<definition name="custDetailMoreInfo" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerMoreInfoTab.jsp" />
+	</definition>
+
+	<definition name="custDetailContact" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerContactTab.jsp" />
+	</definition>
+
+	<definition name="custDetailAddress" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerAddressTab.jsp" />
+	</definition>
+
+	<definition name="custDetailSr" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerSrTab.jsp" />
+	</definition>
+
+	<definition name="custDetailCp" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerCpTab.jsp" />
+	</definition>
+
+	<definition name="custDetailInc" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerIncTab.jsp" />
+	</definition>
+
+	<definition name="custDetailAsset" extends="layoutTab">
+		<put-attribute name="body" value="/WEB-INF/view/customer/customerAssetTab.jsp" />
+	</definition>
+	<!-- End Customer Module -->
+
+	<!-- Begin Consulting Module -->
+	<definition name="consulting" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/consulting/consulting.jsp" />
+	</definition>
+	<!-- Begin Consulting Module -->
+
+	<definition name="activity" extends="layoutBase">
+		<put-attribute name="body" value="/WEB-INF/view/activity/activity.jsp" />
+	</definition>
+
+</tiles-definitions>

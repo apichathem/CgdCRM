@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="SYNC.GET_LAST_SYNC_DATE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT DATE_FORMAT(NOW(),'%Y%m%d%H%i%s')
+		]]>
+		</query>
+	</sql-service>	
+	<sql-service name="SYNC.INSERT_ACTIVITY_LOG" type="named-parameter" showSql="true">
+		<query><![CDATA[				
+			INSERT INTO TP_ACTIVITY_LOG (ACTIVITY_ID, AGENT_CODE, SCORE, DATETIME, ETC1, ETC2, ETC3)
+			SELECT :activity_id, :agent_code, S.ACT_SCORES, NOW(), :etc1, :etc2, :etc3
+			FROM TP_ACTIVITY_SCORES S
+			WHERE S.ACT_ACTION_CODE = :activity_id
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.INSERT_OPPORTUNITY_AGENT" type="named-parameter" showSql="true">
+		<query>
+			<![CDATA[
+				INSERT INTO TP_OPPORTUNITY_AGENT (oppt_id, agent_code, reg_dt) VALUES (:oppt_id, :agent_code, now());
+			]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.INSERT_OPPORTUNITY" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			INSERT INTO TP_OPPORTUNITY
+			(
+				oppt_id
+				, title_code
+				, first_name
+				, last_name
+				, nickname
+				, card_no
+				, birth_date
+				, gender
+				, age
+				, occupation_code
+				, email
+				, mobile_no
+				, phone_no
+				, fax_no
+				, frequent_use_clinic
+				, recommend_by
+				, recommend_relation
+				, recommend_relation_desc
+				, marital_status
+				, number_of_children
+				, salary
+				, debt
+				, current_savings
+				, investment_flag
+				, welfare_flag
+				, future_savings
+				, future_age
+				, future_health
+				, future_travel
+				, future_retire
+				, coverage_cancer
+				, coverage_critical_illness
+				, coverage_sickness_treatment
+				, coverage_accident_treatment
+				, coverage_disability
+				, coverage_death
+				, spouse_title_code
+				, spouse_first_name
+				, spouse_last_name
+				, spouse_birth_date
+				, status
+				, create_date
+				, update_date
+				, delete_date
+				, deleted
+				, reg_dt
+				, chg_dt
+			) 
+			VALUES
+			(
+				:oppt_id
+				, :title_code
+				, :first_name
+				, :last_name
+				, :nickname
+				, :card_no
+				, :birth_date
+				, :gender
+				, :age
+				, :occupation_code
+				, :email
+				, :mobile_no
+				, :phone_no
+				, :fax_no
+				, :frequent_use_clinic
+				, :recommend_by
+				, :recommend_relation
+				, :recommend_relation_desc
+				, :marital_status
+				, :number_of_children
+				, :salary
+				, :debt
+				, :current_savings
+				, :investment_flag
+				, :welfare_flag
+				, :future_savings
+				, :future_age
+				, :future_health
+				, :future_travel
+				, :future_retire
+				, :coverage_cancer
+				, :coverage_critical_illness
+				, :coverage_sickness_treatment
+				, :coverage_accident_treatment
+				, :coverage_disability
+				, :coverage_death
+				, :spouse_title_code
+				, :spouse_first_name
+				, :spouse_last_name
+				, :spouse_birth_date
+				, :status
+				, :create_date
+				, :update_date
+				, :delete_date
+				, :deleted
+				, now()
+				, now()
+			);
+		]]>
+		</query>
+	</sql-service>	
+	<sql-service name="SYNC.UPDATE_OPPORTUNITY" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			UPDATE TP_OPPORTUNITY
+			SET 	
+				title_code = :title_code
+				, first_name = :first_name
+				, last_name = :last_name
+				, nickname = :nickname
+				, card_no = :card_no
+				, birth_date = :birth_date
+				, gender = :gender
+				, age = :age
+				, occupation_code = :occupation_code
+				, email = :email
+				, mobile_no = :mobile_no
+				, phone_no = :phone_no
+				, fax_no = :fax_no
+				, frequent_use_clinic = :frequent_use_clinic
+				, recommend_by = :recommend_by
+				, recommend_relation = :recommend_relation
+				, recommend_relation_desc = :recommend_relation_desc
+				, marital_status = :marital_status
+				, number_of_children = :number_of_children
+				, salary = :salary
+				, debt = :debt
+				, current_savings = :current_savings
+				, investment_flag = :investment_flag
+				, welfare_flag = :welfare_flag
+				, future_savings = :future_savings
+				, future_age = :future_age
+				, future_health = :future_health
+				, future_travel = :future_travel
+				, future_retire = :future_retire
+				, coverage_cancer = :coverage_cancer
+				, coverage_critical_illness = :coverage_critical_illness
+				, coverage_sickness_treatment = :coverage_sickness_treatment
+				, coverage_accident_treatment = :coverage_accident_treatment
+				, coverage_disability = :coverage_disability
+				, coverage_death = :coverage_death
+				, spouse_title_code = :spouse_title_code
+				, spouse_first_name = :spouse_first_name
+				, spouse_last_name = :spouse_last_name
+				, spouse_birth_date = :spouse_birth_date
+				, status = :status
+				, update_date = :update_date
+				, delete_date = :delete_date
+				, deleted = :deleted
+				, chg_dt = now()
+			WHERE oppt_id = :oppt_id
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.INSERT_OPPORTUNITY_ADDRESS" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			INSERT INTO TP_OPPORTUNITY_ADDRESS
+			(
+				oppt_addr_id
+				, oppt_id
+				, address_type
+				, address_building
+				, address_moo
+				, address_soi
+				, address_road
+				, address_province
+				, address_district
+				, address_sub_district
+				, address_post_code
+				, create_date
+				, update_date
+				, deleted
+				, reg_dt
+				, chg_dt
+			) 
+			VALUES
+			(
+				:oppt_addr_id
+				, :oppt_id
+				, :address_type
+				, :address_building
+				, :address_moo
+				, :address_soi
+				, :address_road
+				, :address_province
+				, :address_district
+				, :address_sub_district
+				, :address_post_code
+				, :create_date
+				, :update_date
+				, :deleted
+				, now()
+				, now()
+			);
+		]]>
+		</query>
+	</sql-service>	
+	<sql-service name="SYNC.UPDATE_OPPORTUNITY_ADDRESS" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			UPDATE TP_OPPORTUNITY_ADDRESS
+			SET 	
+				address_type = :address_type
+				, address_building = :address_building
+				, address_moo = :address_moo
+				, address_soi = :address_soi
+				, address_road = :address_road
+				, address_province = :address_province
+				, address_district = :address_district
+				, address_sub_district = :address_sub_district
+				, address_post_code = :address_post_code
+				, update_date = :update_date
+				, deleted = :deleted
+				, chg_dt = now()
+			WHERE oppt_addr_id = :oppt_addr_id
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.INSERT_OPPORTUNITY_CHILD" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			INSERT INTO TP_OPPORTUNITY_CHILD
+			(
+				oppt_child_id
+				, oppt_id
+				, title_code
+				, first_name
+				, last_name
+				, birth_date
+				, gender
+				, age				
+				, create_date
+				, update_date
+				, deleted
+				, reg_dt
+				, chg_dt
+			) 
+			VALUES
+			(
+				:oppt_child_id
+				, :oppt_id
+				, :title_code
+				, :first_name
+				, :last_name
+				, :birth_date
+				, :gender
+				, :age				
+				, :create_date
+				, :update_date
+				, :deleted
+				, now()
+				, now()
+			);
+		]]>
+		</query>
+	</sql-service>	
+	<sql-service name="SYNC.UPDATE_OPPORTUNITY_CHILD" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			UPDATE TP_OPPORTUNITY_CHILD
+			SET 	
+				title_code = :title_code
+				, first_name = :first_name
+				, last_name = :last_name
+				, birth_date = :birth_date
+				, gender = :gender
+				, age = :age		
+				, update_date = :update_date
+				, deleted = :deleted
+				, chg_dt = now()
+			WHERE oppt_child_id = :oppt_child_id
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.INSERT_OPPORTUNITY_INVESTMENT" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			INSERT INTO TP_OPPORTUNITY_INVESTMENT
+			(
+				oppt_invest_id
+				, oppt_id
+				, invest_code
+				, benefit
+				, create_date
+				, update_date
+				, deleted
+				, reg_dt
+				, chg_dt
+			) 
+			VALUES
+			(
+				:oppt_invest_id
+				, :oppt_id
+				, :invest_code
+				, :benefit
+				, :create_date
+				, :update_date
+				, :deleted
+				, now()
+				, now()
+			);
+		]]>
+		</query>
+	</sql-service>	
+	<sql-service name="SYNC.UPDATE_OPPORTUNITY_INVESTMENT" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			UPDATE TP_OPPORTUNITY_INVESTMENT
+			SET 	
+				invest_code = :invest_code
+				, benefit = :benefit
+				, update_date = :update_date
+				, deleted = :deleted
+				, chg_dt = now()
+			WHERE oppt_invest_id = :oppt_invest_id
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.INSERT_OPPORTUNITY_WELFARE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			INSERT INTO TP_OPPORTUNITY_WELFARE
+			(
+				oppt_welfare_id
+				, oppt_id
+				, detail
+				, create_date
+				, update_date
+				, deleted
+				, reg_dt
+				, chg_dt
+			) 
+			VALUES
+			(
+				:oppt_welfare_id
+				, :oppt_id
+				, :detail
+				, :create_date
+				, :update_date
+				, :deleted
+				, now()
+				, now()
+			);
+		]]>
+		</query>
+	</sql-service>	
+	<sql-service name="SYNC.UPDATE_OPPORTUNITY_WELFARE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			UPDATE TP_OPPORTUNITY_WELFARE
+			SET 	
+				detail = :detail
+				, update_date = :update_date
+				, deleted = :deleted
+				, chg_dt = now()
+			WHERE oppt_welfare_id = :oppt_welfare_id
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.GET_OPPORTUNITY_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT * FROM TP_OPPORTUNITY OP INNER JOIN TP_OPPORTUNITY_AGENT OA ON OP.OPPT_ID = OA.OPPT_ID 
+			WHERE OA.AGENT_CODE = :AGENT_CODE 
+			${#LAST_SYNC_DATE?.text}  
+			${#EXCLUDE_DELETED?.text}  
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true"/>
+		<parameter name="LAST_SYNC_DATE"> AND OP.CHG_DT > :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND OP.DELETED != 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.GET_OPPORTUNITY_ADDRESS_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT * FROM TP_OPPORTUNITY_ADDRESS OP INNER JOIN TP_OPPORTUNITY_AGENT OA ON OP.OPPT_ID = OA.OPPT_ID 
+			WHERE OA.AGENT_CODE = :AGENT_CODE 
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true"/>
+		<parameter name="LAST_SYNC_DATE"> AND OP.CHG_DT > :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND OP.DELETED != 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.GET_OPPORTUNITY_INVESTMENT_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT * FROM TP_OPPORTUNITY_INVESTMENT OP INNER JOIN TP_OPPORTUNITY_AGENT OA ON OP.OPPT_ID = OA.OPPT_ID 
+			WHERE OA.AGENT_CODE = :AGENT_CODE 
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true"/>
+		<parameter name="LAST_SYNC_DATE"> AND OP.CHG_DT > :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND OP.DELETED != 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.GET_OPPORTUNITY_WELFARE_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT * FROM TP_OPPORTUNITY_WELFARE OP INNER JOIN TP_OPPORTUNITY_AGENT OA ON OP.OPPT_ID = OA.OPPT_ID 
+			WHERE OA.AGENT_CODE = :AGENT_CODE 
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true"/>
+		<parameter name="LAST_SYNC_DATE"> AND OP.CHG_DT > :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND OP.DELETED != 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.GET_OPPORTUNITY_CHILD_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT * FROM TP_OPPORTUNITY_CHILD OP INNER JOIN TP_OPPORTUNITY_AGENT OA ON OP.OPPT_ID = OA.OPPT_ID 
+			WHERE OA.AGENT_CODE = :AGENT_CODE 
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true"/>
+		<parameter name="LAST_SYNC_DATE"> AND OP.CHG_DT > :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND OP.DELETED != 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_BRANCH_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT 
+				B.BRANCH_CODE AS ID ,
+				B.BRANCH_NAME AS NAME ,
+				B.LATITUDE ,
+				B.LONGITUDE ,
+				B.TELEPHONE_NO AS CONTACT_NO ,
+				CONCAT(B.ROOM_NO, ' ', B.MOO, ' ', B.BUILDING, ' ', B.SOI, ' ', B.ROAD, ' ', T.NAME, ' ', A.NAME, ' ', P.NAME, ' ', T.POSTCODE) AS ADDRESS ,
+				P.REGION_CODE ,
+				B.PROVINCE_CODE ,
+			    B.AMPHUR_CODE ,
+				'' AS WEBSITE ,
+				'Y' AS USE_YN
+			FROM ST_BRANCH B
+				INNER JOIN ST_PROVINCE P ON P.PROVINCE_CODE = B.PROVINCE_CODE
+				INNER JOIN ST_AMPHUR A ON A.PROVINCE_CODE = B.PROVINCE_CODE AND A.AMPHUR_CODE = B.AMPHUR_CODE
+				INNER JOIN ST_TUMBON T ON T.TUMBON_CODE = B.TUMBON_CODE AND T.AMPHUR_CODE = B.AMPHUR_CODE AND T.PROVINCE_CODE = B.PROVINCE_CODE
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 	
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND B.MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_HOSPITAL_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			select 
+				a.CONTENT_NUMBER AS ID,
+				a.TITLE as NAME,
+				SUBSTRING_INDEX(ad.LAT_LNG,',',1) AS LATITUDE,
+				SUBSTRING_INDEX(SUBSTRING_INDEX(ad.LAT_LNG,',',2),',',-1) AS LONGITUDE ,
+                ad.TEL_NO_1 AS CONTACT_NO, 
+                a.USE_STATUS AS USE_YN ,
+                REPLACE(REPLACE(CONCAT(ad.HOUSE_NO,' , ',ad.MOO,' , ',ad.BUILDING,' , ',ad.SOI,' , ',ad.ROAD,' , ',ad.CITY,' , ',am.NAME,' , ',p.NAME,' , ',ad.POSTAL_CD),' , ',' '),'  ',' ') as ADDRESS,
+				ad.AREA AS REGION_CODE ,
+				ad.PROVINCE AS PROVINCE_CODE ,
+				ad.DISTRICT AS AMPHUR_CODE ,
+				a.COMMON_FLAG AS PA ,
+				a.SUMMARY AS website
+			from tp_content a 
+				left join tp_content_att b on b.CONTENT_ID = a.CONTENT_NUMBER and b.MAIN_FLAG = 1
+				left join tp_content_cat d on a.CONTENT_CAT_ID = d.CONTENT_CAT_ID
+				left JOIN TP_ATT c ON c.ATT_ID = b.ATT_ID
+                left JOIN tp_content_addr ad on ad.CONTENT_ID = a.CONTENT_NUMBER
+				left JOIN st_province p on p.PROVINCE_code = ad.PROVINCE
+  			    left JOIN st_amphur am on am.AMPHUR_code = ad.district
+  
+			where a.TYPE = 'HOSPITAL'  
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND a.CHG_DT >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND a.USE_STATUS = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_CODEBOOK_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			select c.*
+			from tp_codebook c
+			WHERE c.CHANNEL='M'
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND c.CHG_TIME >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND USE_YN = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_INTRODUCE_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			(
+			SELECT  
+				A.ATT_ID AS ID
+				, C.REF_ID AS TYPE
+				, CASE A.DESCP
+				    WHEN 'attPic' THEN 'PIC'	    
+				    ELSE 'VDO'
+				END AS FILE_TYPE
+				, CONCAT(A.ATT_ID, '_', T.FILE_NAME) AS FILE_NAME
+				, '' AS LOCAL_PATH
+				, CASE STATUS
+				    WHEN 0 THEN 'Y'	    
+				    ELSE 'N'
+				END AS DELETED
+			FROM TP_CONTENT C
+			INNER JOIN TP_CONTENT_ATT A ON C.CONTENT_NUMBER = A.CONTENT_ID
+			LEFT JOIN TP_ATT T ON T.ATT_ID = A.ATT_ID
+			WHERE C.TYPE = 'SELFI'
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+			
+			ORDER BY C.ORD			
+			)
+			UNION
+			(
+			SELECT  
+				A.ATT_ID AS ID
+				, 'COMPANY' AS TYPE
+				, CASE A.DESCP
+				    WHEN 'attPic' THEN 'PIC'	    
+				    ELSE 'VDO'
+				END AS FILE_TYPE
+				, CONCAT(A.ATT_ID, '_', T.FILE_NAME) AS FILE_NAME
+				, '' AS LOCAL_PATH
+				, CASE STATUS
+				    WHEN 0 THEN 'Y'	    
+				    ELSE 'N'
+				END AS DELETED
+			FROM TP_CONTENT C
+			INNER JOIN TP_CONTENT_ATT A ON C.CONTENT_NUMBER = A.CONTENT_ID
+			LEFT JOIN TP_ATT T ON T.ATT_ID = A.ATT_ID
+			WHERE C.TYPE = 'COMPANY'
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+			
+			ORDER BY C.ORD
+			)
+			UNION
+			(
+			SELECT  
+				A.ATT_ID AS ID
+				, 'INFK' AS TYPE
+				, CASE A.DESCP
+				    WHEN 'attPic' THEN 'PIC'	    
+				    ELSE 'VDO'
+				END AS FILE_TYPE
+				, CONCAT(A.ATT_ID, '_', T.FILE_NAME) AS FILE_NAME
+				, '' AS LOCAL_PATH
+				, CASE STATUS
+				    WHEN 0 THEN 'Y'	    
+				    ELSE 'N'
+				END AS DELETED
+			FROM TP_CONTENT C
+			INNER JOIN TP_CONTENT_ATT A ON C.CONTENT_NUMBER = A.CONTENT_ID
+			LEFT JOIN TP_ATT T ON T.ATT_ID = A.ATT_ID
+			WHERE C.TYPE = 'INFK'
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+			
+			ORDER BY C.ORD
+			)
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND A.CHG_DT >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND STATUS = 1</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_NEWS_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT
+				CONTENT_NUMBER AS ID
+				, TITLE AS TOPIC
+				, SUMMARY AS CONTENT
+				, DATE_FORMAT(START_DT,'%Y%m%d%H%i%s') AS START_DT
+				, DATE_FORMAT(END_DT,'%Y%m%d%H%i%s') AS END_DT
+				, CASE USE_STATUS
+				    WHEN 'Y' THEN 'N'	    
+				    ELSE 'Y'
+				END AS DELETED
+			FROM TP_CONTENT
+			WHERE TYPE = 'NEWS' 
+			
+			${#LAST_SYNC_DATE?.text}
+			${#EXCLUDE_DELETED?.text}			
+			
+			ORDER BY REG_DT DESC
+			LIMIT 10 			
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND CHG_DT >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND USE_STATUS = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_NEWS_ATTACH_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT
+				A.ATT_ID AS ID
+				, A.CONTENT_ID AS NEWS_ID
+				, A.TITLE
+				, CONCAT(A.ATT_ID, '_', T.FILE_NAME) AS FILE_NAME
+				, T.FILE_TYPE
+				, T.FILE_SIZE
+				, '' AS LOCAL_PATH
+				, A.DESCP AS DESCRIPTION
+				, A.MAIN_FLAG
+				, CASE STATUS
+				    WHEN 0 THEN 'Y'	    
+				    ELSE 'N'
+				END AS DELETED
+			FROM (SELECT * FROM TP_CONTENT A
+					WHERE TYPE = 'NEWS' 			
+					
+						${#LAST_SYNC_DATE?.text}
+					
+						ORDER BY REG_DT DESC
+						LIMIT 10
+					) C
+			INNER JOIN TP_CONTENT_ATT A ON C.CONTENT_NUMBER = A.CONTENT_ID
+			LEFT JOIN TP_ATT T ON A.ATT_ID = T.ATT_ID
+			WHERE C.TYPE = 'NEWS' 
+			
+			${#LAST_SYNC_DATE?.text}
+			${#EXCLUDE_DELETED?.text}		
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND A.CHG_DT >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND STATUS = 1</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT
+				ID
+				, TYPE
+				, TITLE
+				, AGE_FROM
+				, AGE_TO
+				, SEX
+				, SALARY_MIN
+				, SALARY_MAX
+				, CANCER_MIN
+				, CANCER_MAX
+				, OTHER_MIN
+				, OTHER_MAX
+				, SICKNESS_MIN
+				, SICKNESS_MAX
+				, ACCIDENT_MIN
+				, ACCIDENT_MAX
+				, DISABLED_MIN
+				, DISABLED_MAX
+				, DEATH_MIN
+				, DEATH_MAX
+				, CASE ENABLED
+				    WHEN 0 THEN 'Y'	    
+				    ELSE 'N'
+				END AS DELETED
+			FROM TP_RISK
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text}
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND CHG_DT >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ENABLED = 1</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_ATTACH_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT 
+				A.ATT_ID AS ID
+				, R.ID AS RISK_ID
+				, CONCAT(A.ATT_ID, '_', T.FILE_NAME) AS FILE_NAME
+				, '' AS LOCAL_PATH
+				, CASE A.SEQ
+				    WHEN 0 THEN 'VDO'	    
+				    ELSE 'PIC'
+				END AS FILE_TYPE
+				, A.SEQ
+				, CASE A.ENABLED
+				    WHEN 0 THEN 'Y'	    
+				    ELSE 'N'
+				END AS DELETED
+			FROM TP_RISK_ATT A
+			INNER JOIN TP_RISK R ON A.RISK_ID = R.ID
+			LEFT JOIN TP_ATT T ON T.ATT_ID = A.ATT_ID
+			WHERE 1=1
+			
+			${#LAST_SYNC_DATE?.text}
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND A.CHG_DT >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND A.ENABLED = 1</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_CHILD_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT RISK_ID, CHILD_CD, 'N' AS DELETED 
+			FROM TP_RISK_CHILD B
+			INNER JOIN TP_RISK A ON B.RISK_ID = A.ID
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_HRA_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT RISK_ID, HRA_CD, 'N' AS DELETED 
+			FROM TP_RISK_HRA B
+			INNER JOIN TP_RISK A ON B.RISK_ID = A.ID
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_MARITAL_STATUS_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT RISK_ID, MARITAL_STATUS_CD, 'N' AS DELETED 
+			FROM TP_RISK_MARITAL_STATUS B
+			INNER JOIN TP_RISK A ON B.RISK_ID = A.ID
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_OCCUPATION_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT RISK_ID, OCCUPATION_CD, 'N' AS DELETED 
+			FROM TP_RISK_OCCUPATION B
+			INNER JOIN TP_RISK A ON B.RISK_ID = A.ID
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_RISK_REGION_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT RISK_ID, REGION_CODE, 'N' AS DELETED 
+			FROM TP_RISK_REGION B
+			INNER JOIN TP_RISK A ON B.RISK_ID = A.ID
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_WORKING_PERIOD_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				CONCAT(CHANNEL_CODE, PERIOD, YEAR) AS ID
+				, CHANNEL_CODE
+				, PERIOD
+				, YEAR
+				, DATE_FORMAT(START_DATE,'%Y%m%d%h%i%s') AS START_DATE
+				, DATE_FORMAT(END_DATE,'%Y%m%d%h%i%s') AS END_DATE
+			FROM ST_WORKING_PERIOD
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_REGION_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				REGION_CODE AS ID
+				, REGION_CODE
+				, NAME AS REGION_NAME
+				, ACTIVE_FLAG
+			FROM ST_REGION
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ACTIVE_FLAG = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_PROVINCE_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				CONCAT(REGION_CODE, PROVINCE_CODE) AS ID
+				, REGION_CODE
+				, PROVINCE_CODE
+				, NAME AS PROVINCE_NAME
+				, ACTIVE_FLAG
+			FROM ST_PROVINCE
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ACTIVE_FLAG = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_AMPHUR_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				CONCAT(PROVINCE_CODE, AMPHUR_CODE) AS ID
+				, PROVINCE_CODE
+				, AMPHUR_CODE
+				, NAME AS AMPHUR_NAME
+				, ACTIVE_FLAG
+			FROM ST_AMPHUR
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ACTIVE_FLAG = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_TUMBON_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				CONCAT(PROVINCE_CODE, AMPHUR_CODE, TUMBON_CODE) AS ID
+				, PROVINCE_CODE
+				, AMPHUR_CODE
+				, TUMBON_CODE
+				, NAME AS TUMBON_NAME
+				, ACTIVE_FLAG
+			FROM ST_TUMBON
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ACTIVE_FLAG = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_POSTCODE_BY_SYNCDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				CONCAT(PROVINCE_CODE, AMPHUR_CODE, TUMBON_CODE, POSTCODE) AS ID
+				, PROVINCE_CODE
+				, AMPHUR_CODE
+				, TUMBON_CODE
+				, POSTCODE AS POST_CODE
+				, ACTIVE_FLAG
+			FROM ST_POSTCODE
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ACTIVE_FLAG = 'Y'</parameter>
+	</sql-service>
+	<sql-service name="SYNC.SQL_GET_STAGING_PRODUCT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *
+			FROM ST_PRODUCT
+			WHERE 1=1 
+			
+			${#LAST_SYNC_DATE?.text} 
+			${#EXCLUDE_DELETED?.text}
+		]]>
+		</query>
+		<parameter name="LAST_SYNC_DATE"> AND MODIFY_DATE >= :LAST_SYNC_DATE</parameter>
+		<parameter name="EXCLUDE_DELETED"> AND ACTIVE_FLAG = 'Y'</parameter>
+	</sql-service>
+</query-collection>

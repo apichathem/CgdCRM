@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="MENU.INSERT_MENU" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO tp_menu(
+			    MENU_SEQNO, 
+			    CAPTION, 
+			    ACTION, 
+				VISIBLE_YN, 
+				SYSTEM_YN,
+			    REG_ID, 
+			    REG_DT , 
+			    MENU_ICON, 
+			    MENU_LEVEL, 
+			    PARENT_ID, 
+			    CHG_ID, 
+			    CHG_DT, 
+			    MENU_NUMBER) 
+			VALUES (:menuSeq, 
+			    :menuName, 
+			    :menuAction, 
+				:menuEnabled, 
+				'N',
+			    :createBy, 
+			    GETDATE() , 
+			    :menuIcon , 
+			    :menuLevel , 
+			    :menuParentId, 
+			    :createBy, 
+			    GETDATE(), 
+			    (SELECT right('00000000'+ rtrim((MAX(MENU_NUMBER)+1)), 8) FROM TP_MENU))	
+					
+		]]>
+		</query>
+		<parameter name="menuSeq" required="true" />
+		<parameter name="menuName" required="true" />
+		<parameter name="menuAction" required="true" />
+		<parameter name="menuEnabled" required="true" />
+		<parameter name="createBy" required="true" />
+		<parameter name="menuIcon" required="false"/>
+		<parameter name="menuLevel" required="false" />
+		<parameter name="menuParentId" required="false" />
+	</sql-service>
+	
+	<sql-service name="MENU.UPDATE_MENU" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE tp_menu SET
+			   MENU_SEQNO = :menuSeq
+			  ,CAPTION = :menuName
+			  ,ACTION = :menuAction
+			  ,VISIBLE_YN = :menuEnabled
+			  ,CHG_ID = :updateBy
+			  ,CHG_DT = GETDATE()
+			  ,MENU_LEVEL = :menuLevel
+			  ,MENU_ICON = :menuIcon
+			  ,PARENT_ID = :menuParentId
+			  ,MENU_NUMBER = :menuNumber
+			WHERE MENU_ID = :menuId
+					
+		]]>
+		</query>
+		<parameter name="menuId" required="true" />
+		<parameter name="menuSeq" required="true" />
+		<parameter name="menuName" required="true" />
+		<parameter name="menuAction" required="true" />
+		<parameter name="menuEnabled" required="true" />
+		<parameter name="updateBy" required="true" />
+		<parameter name="menuIcon" required="false" />
+		<parameter name="menuLevel" required="false" />
+		<parameter name="menuParentId" required="false" />
+		<parameter name="menuNumber" required="false" />
+	</sql-service>
+	
+	<sql-service name="MENU.SQL_FIND_ALL_PARENT_MENU" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT MENU_ID, CAPTION AS MENU_NAME FROM tp_menu WHERE PARENT_ID=0 ORDER BY MENU_SEQNO		
+		]]>
+		</query>
+		<parameter name="menuSeq" required="true" />
+		<parameter name="menuName" required="true" />
+		<parameter name="menuAction" required="true" />
+		<parameter name="menuEnabled" required="true" />
+		<parameter name="createBy" required="true" />
+		<parameter name="menuIcon" required="false"/>
+		<parameter name="menuLevel" required="false" />
+		<parameter name="menuParentId" required="false" />
+	</sql-service>
+	
+	<sql-service name="MENU.FIND_BY_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT MENU_ID, 
+			    CAPTION AS MENU_NAME, 
+			    ACTION AS MENU_ACTION, 
+			    MENU_ICON, 
+			    MENU_SEQNO AS MENU_SEQ, 
+			    VISIBLE_YN AS MENU_ENABLED, 
+			    MENU_LEVEL, 
+			    PARENT_ID AS MENU_PARENT_ID,
+		        MENU_NUMBER
+			FROM TP_MENU
+			WHERE MENU_ID = :menuId
+					
+		]]>
+		</query>
+		<parameter name="menuId" required="true" />
+	</sql-service>
+	
+	<sql-service name="MENU.FIND_BY_NAME" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+		        CASE WHEN l.MENU_ID IS NOT NULL 
+		          THEN l.MENU_SEQNO 
+		          ELSE m.MENU_SEQNO END AS PARENT_SEQ , 
+		        CASE WHEN l.MENU_ID IS NOT NULL 
+		          THEN l.MENU_ID 
+		          ELSE m.MENU_ID END AS PARENT_ID,  
+		        CASE WHEN l.MENU_ID IS NOT NULL 
+		        
+		          THEN CONCAT(NCHAR(UNICODE(N'└')),m.CAPTION) 
+		          ELSE m.CAPTION END AS MENU_NAME, 
+		        m.MENU_ID, 
+		        m.MENU_SEQNO AS MENU_SEQ,
+		        m.ACTION AS MENU_ACTION,
+		        CASE WHEN m.VISIBLE_YN = 'Y' 
+		          THEN 'แสดง' 
+		          ELSE 'ไม่แสดง' END AS MENU_ENABLED,
+		        m.MENU_NUMBER
+			FROM TP_MENU m
+			LEFT JOIN tp_menu l on m.PARENT_ID=l.MENU_ID
+			WHERE m.CAPTION like :menuName
+			ORDER BY 1,2,m.PARENT_ID,m.MENU_SEQNO,m.ACTION
+		]]>
+		</query>
+		<parameter name="menuName" required="true" prefix="%" suffix="%" />
+	</sql-service>
+	
+	<sql-service name="MENU.FIND_BY_ENABLED" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT CASE WHEN l.MENU_ID IS NOT NULL THEN l.MENU_SEQNO ELSE m.MENU_SEQNO END AS PARENT_SEQ
+			    , CASE WHEN l.MENU_ID IS NOT NULL THEN l.MENU_ID ELSE m.MENU_ID END AS PARENT_ID 
+			    , CASE WHEN l.MENU_ID IS NOT NULL THEN CONCAT(NCHAR(UNICODE(N'└')),m.CAPTION) ELSE m.CAPTION END AS MENU_NAME
+    			, m.MENU_ID, m.MENU_SEQNO
+    			, m.MENU_NUMBER
+		        , CASE WHEN m.PARENT_ID = '0' THEN '1' ELSE '0' END AS IS_PARENT
+			FROM TP_MENU m
+			left join tp_menu l on m.PARENT_ID=l.MENU_ID
+			WHERE m.VISIBLE_YN = 'Y'
+			ORDER BY 1,2,m.PARENT_ID,m.MENU_SEQNO
+		]]>
+		</query>
+	</sql-service>
+	
+	<sql-service name="MENU.FIND_BY_ENABLED_BY_ROLE_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+				
+			SELECT DISTINCT
+		        CASE WHEN l.MENU_ID IS NOT NULL 
+		        	THEN l.MENU_SEQNO 
+		            ELSE m.MENU_SEQNO END AS PARENT_SEQ,
+		        CASE WHEN l.MENU_ID IS NOT NULL 
+		            THEN l.MENU_ID 
+		            ELSE m.MENU_ID END AS PARENT_ID, 
+		        CASE (select count(1) from tp_menu where PARENT_ID = m.MENU_ID)
+				    WHEN 0 THEN 2
+				    ELSE 1 
+				    END AS MENU_LEVEL, 
+		        m.MENU_ID,
+		        m.MENU_SEQNO AS MENU_SEQ, 
+		        m.CAPTION AS MENU_NAME, 
+		        m.ACTION AS MENU_ACTION, 
+		        m.VISIBLE_YN AS MENU_ENABLED, 
+		        m.MENU_ICON, 
+		        m.PARENT_ID AS MENU_PARENT_ID,
+		        m.MENU_NUMBER
+			FROM tp_role_menu_action rm 
+			LEFT JOIN tp_menu m on rm.MENU_ID = m.MENU_ID
+			LEFT JOIN tp_menu l on m.PARENT_ID=l.MENU_ID
+			LEFT JOIN tp_role_menu_action lm on l.MENU_ID=lm.MENU_ID and rm.ROLE_ID=lm.ROLE_ID
+			WHERE rm.ROLE_ID = :roleId 
+	      	AND m.VISIBLE_YN = 'Y' 
+	      	AND (l.MENU_ID IS NULL OR (lm.ROLE_ID IS NOT NULL and l.VISIBLE_YN = 'Y'))
+			ORDER BY 1,2,m.PARENT_ID,m.MENU_SEQNO
+		]]>
+		</query>
+		<parameter name="roleId" required="true"/>
+	</sql-service>
+	
+</query-collection>

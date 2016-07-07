@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="AREA.SQL_SEARCH_PROVINCE_ALL" type="named-parameter" showSql="true">
+		<description>For Display Province Search List</description>		
+		<query><![CDATA[	
+				SELECT	
+					 P.PROVINCE_ID   AS provinceId
+					,P.PROVINCE_NAME AS	provinceName
+				FROM TP_PROVINCE P								
+				ORDER BY P.PROVINCE_NAME ASC
+		]]>
+		</query>
+	</sql-service>
+	<sql-service name="AREA.SQL_SEARCH_CITY_BY_DISTRICT_ID" type="named-parameter" showSql="true">
+		<description>For Display City Search List</description>		
+		<query><![CDATA[	
+				SELECT province_code as provinceCode,
+				    amphur_code as amphurCode,
+				    tumbon_code as tumbonCode,
+				    name,
+				    active_flag as activeFlag,
+				    modify_date as modifyDate
+				FROM st_tumbon
+				WHERE 1=1
+				${#districtId?.text}
+				ORDER BY name ASC;
+		]]>
+		</query>
+		<parameter name="districtId">AND amphur_code = :districtId </parameter>
+	</sql-service>
+	<sql-service name="AREA.SQL_SEARCH_PROVINCE_BY_PROVICE_ID" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+				SELECT	
+				
+					 P.PROVINCE_CODE   AS provinceId
+					,P.NAME AS	provinceName
+
+				FROM ST_PROVINCE P	
+				WHERE	1=1			
+				${#provinceId?.text} 					
+					
+		]]>
+		</query>
+			<parameter name="provinceId">AND P.PROVINCE_CODE = :provinceId </parameter>
+	</sql-service>
+	
+	
+	<sql-service name="AREA.SQL_SEARCH_AMPHUR_BY_PROVICE_ID" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT	
+				 A.AMPHUR_CODE AS ampurId
+				,A.NAME AS ampurName
+				,A.PROVINCE_CODE AS provinceId
+
+			FROM ST_AMPHUR A	
+			WHERE	1=1			
+			${#provinceId?.text} 					
+					
+		]]>
+		</query>
+			<parameter name="provinceId">AND A.PROVINCE_CODE = :provinceId </parameter>
+	</sql-service>
+	
+	
+	<sql-service name="AREA.SQL_SEARCH_PROVINCE_AMPHUR_BY_AMPHUR_ID" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT	
+				 A.AMPHUR_CODE AS ampurId
+				,A.NAME AS ampurName
+				,A.PROVINCE_CODE AS provinceId
+
+			FROM ST_AMPHUR A	
+			WHERE	1=1			
+			${#amphurId?.text} 					
+					
+		]]>
+		</query>
+			<parameter name="amphurId">AND A.AMPHUR_CODE = :amphurId </parameter>
+	</sql-service>
+	
+	
+	<sql-service name="AREA.SQL_SEARCH_ZIPCODE_BY_TUMBON_CODE" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			select postcode from st_postcode where tumbon_code=:tumbon_code
+					
+		]]>
+		</query>
+			<parameter name="tumbon_code" />
+	</sql-service>
+	
+</query-collection>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="REGION.FIND_ALL" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *
+			FROM st_region 
+			WHERE active_flag='Y'
+		]]>
+		</query>
+	</sql-service>
+	
+</query-collection>

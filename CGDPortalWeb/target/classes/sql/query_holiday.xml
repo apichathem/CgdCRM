@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="HOLIDAY.SQL_FIND_HOLIDAY_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT hol.[YEAR], 
+	      	hol.HOLIDAY_ID, 
+	      	hol.TYPE_CD, 
+	      	hol.HOLIDAY_NAME, 
+	      	hol.REMARK, 
+	      	hol.REG_ID, hol.REG_DT, 
+	      	hol.CHG_ID, hol.CHG_DT,
+	      	CONVERT(VARCHAR(10),hol.HOLIDAY_DATE,103) AS HOLIDAY_DATE,
+	      	cbl.CODE_NAME AS TYPE_NAME
+	      	FROM TP_HOLIDAY_INFO hol
+			INNER JOIN TP_CODEBOOK_LANG cbl ON cbl.CODE_TYPE = 'HOLIDAY_TYPE' AND cbl.CODE_ID = hol.TYPE_CD AND cbl.LANG_CD = :langCd
+	      	WHERE YEAR = :year
+			ORDER BY hol.HOLIDAY_DATE
+
+		]]>
+		</query>
+		<parameter name="langCd" required="true"/>
+		<parameter name="year" required="true"/>
+	</sql-service>
+	
+	<sql-service name="HOLIDAY.SQL_FIND_HOLIDAY" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT [YEAR], HOLIDAY_ID, TYPE_CD, HOLIDAY_NAME, REMARK, REG_ID, REG_DT, CHG_ID, CHG_DT, CONVERT(VARCHAR(10),HOLIDAY_DATE,101) AS HOLIDAY_DATE FROM TP_HOLIDAY_INFO
+			WHERE HOLIDAY_ID = :holidayId
+
+		]]>
+		</query>
+		<parameter name="holidayId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="HOLIDAY.SQL_INSERT_HOLIDAY" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			set dateformat dmy
+			INSERT INTO TP_HOLIDAY_INFO
+			(YEAR, TYPE_CD, HOLIDAY_DATE, HOLIDAY_NAME, REG_ID, REG_DT, CHG_ID, CHG_DT) 
+			VALUES(:year, :typeCd, Cast(:holidayDate as datetime), :holidayName, :createBy, GETDATE(), :createBy, GETDATE())
+
+		]]>
+		</query>
+		<parameter name="year" required="true"/>
+		<parameter name="typeCd" required="true"/>
+		<parameter name="holidayDate" required="true"/>
+		<parameter name="holidayName" required="true"/>
+		<parameter name="createBy" required="true"/>
+	</sql-service>
+	
+	<sql-service name="HOLIDAY.SQL_UPDATE_HOLIDAY" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			set dateformat dmy
+			UPDATE TP_HOLIDAY_INFO SET
+			   [YEAR] = :year
+			  ,TYPE_CD = :typeCd
+			  ,HOLIDAY_DATE = Cast(:holidayDate as datetime)
+			  ,HOLIDAY_NAME = :holidayName
+			  ,CHG_ID = :updateBy
+			  ,CHG_DT = GETDATE()
+			WHERE HOLIDAY_ID = :holidayId
+
+		]]>
+		</query>
+		<parameter name="holidayId" required="true"/>
+		<parameter name="year" required="true"/>
+		<parameter name="typeCd" required="true"/>
+		<parameter name="holidayDate" required="true"/>
+		<parameter name="holidayName" required="true"/>
+		<parameter name="updateBy" required="true"/>
+	</sql-service>
+	
+	<sql-service name="HOLIDAY.SQL_DELETE_HOLIDAY" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			DELETE FROM TP_HOLIDAY_INFO WHERE HOLIDAY_ID = :holidayId
+		]]>
+		</query>
+		<parameter name="holidayId" required="true"/>
+	</sql-service>
+	
+</query-collection>

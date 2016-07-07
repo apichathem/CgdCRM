@@ -1,0 +1,17 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 
+ 	<bean id="ExcelKnowledgeBaseCategory" class="com.locus.jlo.web.view.KnowledgeBaseCategoryExcelView">
+	</bean>
+	<bean id="ExcelKnowledgeBaseContent" class="com.locus.jlo.web.view.KnowledgeBaseContentExcelView">
+	</bean>
+	<bean id="CSVKnowledgeBaseCategory" class="com.locus.jlo.web.view.KnowledgeBaseCategoryCsvView">
+	</bean>
+	<bean id="CSVKnowledgeBaseContent" class="com.locus.jlo.web.view.KnowledgeBaseContentCsvView">
+	</bean>
+	<bean id="CSVKnowledgeBaseAllCategory" class="com.locus.jlo.web.view.KnowledgeBaseAllCategoryCsvView">
+	</bean>
+	
+</beans>

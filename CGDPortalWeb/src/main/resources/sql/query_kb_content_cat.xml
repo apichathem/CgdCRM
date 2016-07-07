@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="KB.SQL_SEARCH_KB_CONTENT_CAT1" type="named-parameter" showSql="true">
+		<description>For Display Province Search List</description>		
+		<query><![CDATA[	
+			 
+			  SELECT
+			  
+				   CAT1.CONTENT_CAT_ID AS contentCatId 
+			      ,CAT1.CONTENT_TYPE_CD  AS contentTypeCd 
+			      ,CAT1.CAT_NAME AS catName
+			      ,CAT1.STATUS_CD AS statusCd
+			      ,CAT1.DESCP   AS descp
+			      ,CAT1.SLA_ID AS slaId
+			      ,CAT1.REG_ID AS regId
+			      ,CAT1.REG_DT AS regDt
+			      ,CAT1.CHG_ID AS chgId
+			      ,CAT1.CHG_DT AS chgDt		
+			        
+			   FROM TP_KB_CONTENT_CAT1 CAT1 
+			   ORDER BY CAT1.CAT_NAME ASC
+			   
+		]]>
+		</query>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_SEARCH_KB_CONTENT_CAT2_BY_PARENT_ID" type="named-parameter" showSql="true">
+		<description>For Display Province Search List</description>		
+		<query><![CDATA[	
+			 
+			 SELECT
+			  
+				   CAT2.CONTENT_CAT_ID AS contentCatId 
+			      ,CAT2.CONTENT_TYPE_CD  AS contentTypeCd 
+			      ,CAT2.CAT_NAME AS catName
+			      ,CAT2.STATUS_CD AS statusCd
+				  ,CAT2.PARENT_CAT_ID AS parentCatId
+			      ,CAT2.DESCP   AS descp
+			      ,CAT2.SLA_ID AS slaId
+			      ,CAT2.REG_ID AS regId
+			      ,CAT2.REG_DT AS regDt
+			      ,CAT2.CHG_ID AS chgId
+			      ,CAT2.CHG_DT AS chgDt		
+			        
+			   FROM TP_KB_CONTENT_CAT2 CAT2 
+			   WHERE 1=1
+			   ${#parentCatId?.text} 	
+			   ORDER BY CAT2.CAT_NAME ASC
+			   
+		]]>
+		</query>
+		<parameter name="parentCatId">AND CAT2.PARENT_CAT_ID = :parentCatId </parameter>
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_SEARCH_KB_CONTENT_CAT3_BY_PARENT_ID" type="named-parameter" showSql="true">
+		<description>For Display Province Search List</description>		
+		<query><![CDATA[	
+			 
+			 SELECT
+			  
+				   CAT3.CONTENT_CAT_ID AS contentCatId 
+			      ,CAT3.CONTENT_TYPE_CD  AS contentTypeCd 
+			      ,CAT3.CAT_NAME AS catName
+			      ,CAT3.STATUS_CD AS statusCd
+				  ,CAT3.PARENT_CAT_ID AS parentCatId
+			      ,CAT3.DESCP   AS descp
+			      ,CAT3.SLA_ID AS slaId
+			      ,CAT3.REG_ID AS regId
+			      ,CAT3.REG_DT AS regDt
+			      ,CAT3.CHG_ID AS chgId
+			      ,CAT3.CHG_DT AS chgDt		
+			        
+			   FROM TP_KB_CONTENT_CAT3 CAT3 
+			   WHERE 1=1
+			   ${#parentCatId?.text} 	
+			   ORDER BY CAT3.CAT_NAME ASC
+			   
+		]]>
+		</query>
+		<parameter name="parentCatId">AND CAT3.PARENT_CAT_ID = :parentCatId </parameter>
+		
+	</sql-service>
+	<sql-service name="KB.SQL_SEARCH_KB_CONTENT_CAT4_BY_PARENT_ID" type="named-parameter" showSql="true">
+		<description>For Display Province Search List</description>		
+		<query><![CDATA[	
+			 
+			 SELECT
+			  
+				   CAT4.CONTENT_CAT_ID AS contentCatId 
+			      ,CAT4.CONTENT_TYPE_CD  AS contentTypeCd 
+			      ,CAT4.CAT_NAME AS catName
+			      ,CAT4.STATUS_CD AS statusCd
+				  ,CAT4.PARENT_CAT_ID AS parentCatId
+			      ,CAT4.DESCP   AS descp
+			      ,CAT4.SLA_ID AS slaId
+			      ,CAT4.REG_ID AS regId
+			      ,CAT4.REG_DT AS regDt
+			      ,CAT4.CHG_ID AS chgId
+			      ,CAT4.CHG_DT AS chgDt		
+			        
+			   FROM TP_KB_CONTENT_CAT4 CAT4 
+			   WHERE 1=1
+			   ${#parentCatId?.text} 	
+			   ORDER BY CAT4.CAT_NAME ASC
+			   
+		]]>
+		</query>
+		<parameter name="parentCatId">AND CAT4.PARENT_CAT_ID = :parentCatId </parameter>
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_SEARCH_KB_CONTENT_CAT5_BY_PARENT_ID" type="named-parameter" showSql="true">
+		<description>For Display Province Search List</description>		
+		<query><![CDATA[	
+			 
+			 SELECT
+			  
+				   CAT5.CONTENT_CAT_ID AS contentCatId 
+			      ,CAT5.CONTENT_TYPE_CD  AS contentTypeCd 
+			      ,CAT5.CAT_NAME AS catName
+			      ,CAT5.STATUS_CD AS statusCd
+				  ,CAT5.PARENT_CAT_ID AS parentCatId
+			      ,CAT5.DESCP   AS descp
+			      ,CAT5.SLA_ID AS slaId
+			      ,CAT5.REG_ID AS regId
+			      ,CAT5.REG_DT AS regDt
+			      ,CAT5.CHG_ID AS chgId
+			      ,CAT5.CHG_DT AS chgDt		
+			        
+			   FROM TP_KB_CONTENT_CAT5 CAT5 
+			   WHERE 1=1
+			   ${#parentCatId?.text} 	
+			   ORDER BY CAT5.CAT_NAME ASC
+			   
+		]]>
+		</query>
+		<parameter name="parentCatId">AND CAT5.PARENT_CAT_ID = :parentCatId </parameter>
+		
+	</sql-service>
+	
+</query-collection>

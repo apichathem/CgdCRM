@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+    <sql-service name="CONSULTING.SQL_INSERT" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+           INSERT INTO TP_CONSULTING (
+			   CONSULTING_NUMBER
+			  ,STATUS_CD
+			  ,START_DT
+			  ,OWNER_ID
+			  ,CUST_ID
+			  ,CALL_OBJECT_ID
+			  ,CALLING_NUMBER
+			  ,REG_ID
+			  ,REG_DT
+			) VALUES (
+			   :consultingNumber  -- CONSULTING_NUMBER - varchar(20)
+			  ,:statusCd -- STATUS_CD - varchar(15)
+			  ,:startDt -- START_DT - datetime
+			  ,:ownerId -- OWNER_ID - varchar(15)
+			  ,:custId
+			  ,:callObjectId
+			  ,:callingNumber
+			  ,:regId -- REG_ID - varchar(15)
+			  ,:regDt -- REG_DT - datetime
+			)
+        ]]>
+        </query>
+        <parameter name="consultingNumber" required="true"/>
+        <parameter name="statusCd" required="true"/>
+        <parameter name="startDt" required="false"/>
+        <parameter name="ownerId" required="true"/>
+        <parameter name="custId" required="false"/>
+        <parameter name="callObjectId" required="false"/>
+        <parameter name="callingNumber" required="false"/>
+        <parameter name="regId" required="true"/>
+        <parameter name="regDt" required="true"/>
+    </sql-service>
+    
+    <sql-service name="CONSULTING.SQL_UPDATE" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+          UPDATE TP_CONSULTING SET
+			  CHANNEL_CD = :channelCd -- varchar(15)
+			  ,STATUS_CD = :statusCd -- varchar(15)
+			 
+			 -- ,START_DT = :startDt -- datetime
+			  ,END_DT = :endDt -- datetime
+			 
+			  ,TITLE = :title -- varchar(100)
+
+
+			  ,OWNER_ID = :ownerId -- varchar(15)
+			  ,NOTE = :note -- varchar(500)
+			  ,CHG_ID = :chgId -- varchar(15)
+			  ,CHG_DT = :chgDt -- datetime
+			  ,CUST_ID = :custId -- varchar(15)
+			  ,CONSULTING_TYPE_CD = :consultingTypeCd -- varchar(15)
+			  ,CONTACT_ID = :contactId -- varchar(15)
+			  ,HOUSEHOLD_ID = :householdId -- varchar(15)
+			  ,REF_CONTACT_TYPE = :refContactType -- varchar(15)
+			  ,REF_CUST_TYPE = :refCustType -- varchar(15)
+			WHERE CONSULTING_NUMBER = :consultingNumber 
+				-- ${#ownerGroup?.text}
+        ]]>
+        </query>
+        <parameter name="consultingNumber" required="true"/>
+        <parameter name="channelCd" required="true"/>
+        <parameter name="statusCd" required="true"/>
+        <parameter name="startDt" required="false"/>
+        <parameter name="endDt" required="false"/>
+        <parameter name="title" required="false"/>
+        
+
+        <parameter name="ownerId" required="false"/>
+        <parameter name="note" required="false"/>
+        <parameter name="chgId" required="false"/>
+        <parameter name="chgDt" required="false"/>
+        <parameter name="custId" required="false"/>
+        <parameter name="consultingTypeCd" required="false"/>
+        <parameter name="contactId" required="false"/>
+        <parameter name="householdId" required="false"/>
+        <parameter name="refContactType" required="false"/>
+        <parameter name="refCustType" required="false"/>
+        <parameter name="ownerGroup"> AND OWNER_ID IN (:ownerGroup) </parameter>
+    </sql-service>
+    
+    <sql-service name="CONSULTING.SQL_FIND" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+          	SELECT  CONS.CONSULTING_NUMBER															
+					, CONS.TITLE													
+					, CONS.START_DT													
+					, CBL1.CODE_NAME AS CHANNEL_NAME													
+					, CBL2.CODE_NAME AS STATUS_NAME													
+					, CBL4.CODE_NAME AS 'TYPE_NAME'													
+					, CASE CUST.TYPE_CD													
+						WHEN 'I' THEN ISNULL(CBL3.CODE_NAME,'')+ISNULL(IND.FIRST_NAME,'')+ ' '+ISNULL(IND.LAST_NAME,'')												
+						ELSE CORP.COMPANY_NAME												
+					  END AS CUST_NAME													
+					, ISNULL(EMP1.FIRST_NAME,'')+' '+ISNULL(EMP1.LAST_NAME,'') AS OWNER_NAME			
+					, CONS.STATUS_CD, CONS.CUST_ID, CONS.CONSULTING_TYPE_CD
+					, CONS.NOTE, CONS.OWNER_ID, CONS.CALLING_NUMBER
+					, CONS.REG_ID, CONS.REG_DT, CONS.CHG_ID, CONS.CHG_DT
+					, CONS.CONTACT_ID, ISNULL(CONTIND.FIRST_NAME,'')+ ' '+ISNULL(CONTIND.LAST_NAME,'') AS CONTACT_NAME, CONS.CHANNEL_CD, CONS.END_DT 								
+			FROM TP_CONSULTING CONS															
+			LEFT OUTER JOIN TP_CUST_MASTER CUST ON CONS.CUST_ID = CUST.CUST_ID															
+			LEFT OUTER JOIN TP_INDIVIDUAL IND ON CUST.IND_ID = IND.IND_ID AND CUST.TYPE_CD = 'I'	
+			LEFT OUTER JOIN TP_INDIVIDUAL CONTIND ON CONS.CONTACT_ID = CONTIND.IND_ID 														
+			LEFT OUTER JOIN TP_CORPORATION CORP ON CUST.CORP_ID = CORP.CORP_ID AND CUST.TYPE_CD = 'C'															
+			LEFT OUTER JOIN TP_CODEBOOK CB1 ON CONS.CHANNEL_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'CONSULT_CHANNEL' AND CB1.USE_YN = 'Y'															
+			LEFT OUTER JOIN TP_CODEBOOK_LANG CBL1 ON CONS.CHANNEL_CD = CBL1.CODE_ID AND CBL1.CODE_TYPE = 'CONSULT_CHANNEL' AND CBL1.LANG_CD = :langCd															
+			LEFT OUTER JOIN TP_CODEBOOK CB2 ON CONS.STATUS_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'CONSULT_STATUS' AND CB2.USE_YN = 'Y'															
+			LEFT OUTER JOIN TP_CODEBOOK_LANG CBL2 ON CONS.STATUS_CD = CBL2.CODE_ID AND CBL2.CODE_TYPE = 'CONSULT_STATUS' AND CBL2.LANG_CD = :langCd															
+			LEFT OUTER JOIN TP_CODEBOOK CB3 ON IND.TITLE_CD = CB3.CODE_ID AND CB3.CODE_TYPE = 'TITLE_NAME' AND CB3.USE_YN ='Y'															
+			LEFT OUTER JOIN TP_CODEBOOK_LANG CBL3 ON IND.TITLE_CD = CBL3.CODE_ID AND CBL3.CODE_TYPE = 'TITLE_NAME' AND CBL3.LANG_CD =:langCd															
+			LEFT OUTER JOIN TP_CODEBOOK CB4 ON CONS.CONSULTING_TYPE_CD = CB4.CODE_ID AND CB4.CODE_TYPE = 'CONSULT_TYPE' AND CB4.USE_YN ='Y'															
+			LEFT OUTER JOIN TP_CODEBOOK_LANG CBL4 ON CONS.CONSULTING_TYPE_CD = CBL4.CODE_ID AND CBL4.CODE_TYPE = 'CONSULT_TYPE' AND CBL4.LANG_CD = :langCd															
+			LEFT OUTER JOIN TP_USR_MASTER USR1 ON CONS.OWNER_ID = USR1.USER_ID															
+			LEFT OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID
+			WHERE 1=1
+				${#consultingNumber?.text}
+				${#channelCd?.text}
+				${#statusCd?.text}
+				${#startDt?.text}
+				${#endDt?.text}
+				${#title?.text}
+				${#callingNumber?.text}
+				${#ownerId?.text}
+				${#ownerGroup?.text}
+				${#custId?.text}
+				${#consultingTypeCd?.text}
+				${#contactId?.text}
+			ORDER BY CONS.REG_DT DESC
+        ]]>
+        </query>
+        <parameter name="consultingNumber"> AND CONS.CONSULTING_NUMBER = :consultingNumber </parameter>
+        <parameter name="channelCd"> AND CONS.CHANNEL_CD = :channelCd </parameter>
+        <parameter name="statusCd"> AND CONS.STATUS_CD = :statusCd </parameter>
+        <parameter name="startDt"><![CDATA[ AND CONS.START_DT >= :startDt ]]></parameter>
+        <parameter name="endDt"><![CDATA[ AND CONS.START_DT <= (:endDt)+1 ]]></parameter>
+        <parameter name="title" prefix="%" suffix="%"> AND CONS.TITLE like :title </parameter>
+        <parameter name="callingNumber"> AND CONS.CALLING_NUMBER = :callingNumber </parameter>
+        <parameter name="ownerId"> AND CONS.OWNER_ID = :ownerId </parameter>
+        <parameter name="ownerGroup"> AND CONS.OWNER_ID IN (:ownerGroup) </parameter>
+        <parameter name="custId"> AND CONS.CUST_ID = :custId </parameter>
+        <parameter name="consultingTypeCd"> AND CONS.CONSULTING_TYPE_CD = :consultingTypeCd </parameter>
+        <parameter name="contactId"> AND CONS.CONTACT_ID = :contactId </parameter>
+        <parameter name='langCd' required="false" />
+    </sql-service>
+    
+    <sql-service name="CONSULTING.SQL_INSERT_TP_REL_CONSULTING" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+           INSERT INTO TP_REL_CONSULT
+					(
+						CONSULTING_ID,
+						REF_ID
+					)
+				VALUES
+					(
+						:consultingId,
+						:refId
+					)
+        ]]>
+        </query>
+        <parameter name="consultingId" required="true"/>
+        <parameter name="refId" required="true"/>
+    </sql-service>
+    
+    
+    <sql-service name="CONSULTING.SQL_FIND_CUSTOMER_BY_ID" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+	        SELECT TOP 1 
+        	  CT.CONSULTING_NUMBER AS consultingNumber
+        	 ,CT.CUST_ID AS custId
+        	 ,CUST.CUST_NAME AS custName
+        	 ,CUST.TYPE_CD  AS custType
+        	 
+			FROM TP_CONSULTING CT
+			LEFT OUTER JOIN TP_CUST_MASTER CUST ON CT.CUST_ID = CUST.CUST_ID
+			LEFT OUTER JOIN TP_INDIVIDUAL IND ON CUST.IND_ID = IND.IND_ID 
+			LEFT OUTER JOIN TP_CORPORATION CORP ON CUST.CORP_ID = CORP.CORP_ID
+			WHERE			
+			${#custId?.text}
+			
+			ORDER BY CT.REG_DT DESC
+        ]]>
+        </query>
+        
+        <parameter name="custId"> CUST.CUST_ID = :custId </parameter>
+    </sql-service>
+    
+    <sql-service name="CONSULTING.SQL_FIND_CONTACT_LIST" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+	        SELECT
+				A.IND_ID ,
+				ISNULL(CBL1.CODE_NAME,'')+ISNULL(IND.FIRST_NAME,'')+' '+ISNULL(IND.LAST_NAME
+				,'') AS FIRST_NAME ,
+				CASE ISNULL(CUST_ID,0) 
+					WHEN 0 
+					THEN 
+					CASE ISNULL(CONT_ID,0) 
+						WHEN 0 
+						THEN 'WRONG DATA' 
+						ELSE 'CONTACT ONLY' 
+					END 
+					ELSE 'CUSTOMER' 
+				END                                                                                  
+				AS TYPE ,
+				IND.CITIZEN_ID ,
+				IND.MOBILE_NO ,
+				IND.EMAIL 
+			FROM
+				(	SELECT
+						IND.IND_ID,
+						CUST.CUST_ID,
+						CONT.CONT_ID 
+					FROM TP_INDIVIDUAL IND 
+					LEFT OUTER JOIN TP_CUST_MASTER CUST ON IND.IND_ID = CUST.IND_ID
+					LEFT OUTER JOIN TP_CONTACT COT ON IND.IND_ID = COT.IND_ID
+					LEFT OUTER JOIN TP_CUST_CONTACT CONT ON COT.CONT_ID = CONT.CONT_ID
+					WHERE CONT.CUST_ID  = :custId
+				)
+				A 	
+			LEFT OUTER JOIN TP_INDIVIDUAL IND 
+				ON A.IND_ID = IND.IND_ID 
+			LEFT OUTER JOIN TP_CODEBOOK CB1 
+				ON IND.TITLE_CD = CB1.CODE_ID AND
+				CB1.CODE_TYPE = 'TITLE_NAME' AND
+				USE_YN = 'Y' 
+			LEFT OUTER JOIN TP_CODEBOOK_LANG CBL1 
+				ON CB1.CODE_ID = CBL1.CODE_ID AND
+				CB1.CODE_TYPE = CBL1.CODE_TYPE AND
+				CBL1.LANG_CD = :langCd 
+			WHERE 1=1
+			${#firstName?.text}
+			${#lastName?.text}
+			${#mobileNo?.text}
+        ]]>
+        </query>
+        
+        <parameter name="custId" />
+        <parameter name="langCd" />
+        <parameter name="firstName" prefix="%" suffix="%"> AND IND.FIRST_NAME like :firstName </parameter>
+        <parameter name="lastName" prefix="%" suffix="%"> AND IND.LAST_NAME like :lastName </parameter>
+        <parameter name="mobileNo"> AND IND.MOBILE_NO = :mobileNo </parameter>
+    </sql-service>
+    
+    
+    
+    
+</query-collection>

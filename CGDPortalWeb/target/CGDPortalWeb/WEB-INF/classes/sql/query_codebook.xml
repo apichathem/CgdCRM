@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+
+	<sql-service name="CODEBOOK.SQL_FIND_CODEBOOK_BY_CODE_TYPE_AND_CODE_NAME" type="named-parameter" showSql="true">
+		<description>Find codebook by type and id.</description>		
+		<query><![CDATA[	
+			SELECT c.*, cl.CODE_NAME AS CODE_NAME_EN, cl.CODE_NAME AS CODE_NAME_TH
+			FROM TP_CODEBOOK c
+			INNER JOIN TP_CODEBOOK_LANG cl on cl.CODE_ID = c.CODE_ID AND cl.CODE_TYPE = c.CODE_TYPE AND cl.LANG_CD = :langCd
+			WHERE 1=1
+			 
+			${#codeType?.text}
+			${#parentType?.text}
+			${#codeName?.text}
+			
+		]]>
+		</query>
+		
+		<parameter name='codeType' prefix="%" suffix="%"> AND c.CODE_TYPE like :codeType</parameter>
+		<parameter name='parentType' prefix="%" suffix="%"> AND c.PARENT_TYPE like :parentType</parameter>
+		<parameter name='codeName' prefix="%" suffix="%"> AND cl.CODE_NAME like :codeName</parameter>
+		<parameter name="langCd" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_FIND_CODEBOOK_BY_CODE_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT c.*, rl.CODE_NAME AS PARENT_NAME,
+				createEmp.FIRST_NAME + ' ' + createEmp.LAST_NAME AS CREATE_BY, 
+				updateEmp.FIRST_NAME + ' ' + updateEmp.LAST_NAME AS UPDATE_BY,
+				CONVERT(VARCHAR(10), c.REG_TIME, 103) + ' '  + convert(VARCHAR(5), c.REG_TIME, 14) AS CREATE_DATE,
+				CONVERT(VARCHAR(10), c.CHG_TIME, 103) + ' '  + convert(VARCHAR(5), c.CHG_TIME, 14) AS UPDATE_DATE 
+			FROM TP_CODEBOOK c
+			
+	      	LEFT OUTER JOIN TP_USR_MASTER createUser on createUser.USER_ID = c.REG_ID
+	      	LEFT OUTER JOIN TP_EMPLOYEE createEmp on createEmp.EMP_ID = createUser.EMP_ID
+	      	LEFT OUTER JOIN TP_USR_MASTER updateUser on updateUser.USER_ID = c.CHG_ID
+	      	LEFT OUTER JOIN TP_EMPLOYEE updateEmp on updateEmp.EMP_ID = createUser.CHG_ID
+			
+			LEFT OUTER JOIN TP_CODEBOOK r on c.PARENT_ID = r.CODE_ID and c.PARENT_TYPE = r.CODE_TYPE
+      		LEFT OUTER JOIN TP_CODEBOOK_LANG rl on r.CODE_ID = rl.CODE_ID and r.CODE_TYPE = rl.CODE_TYPE and rl.LANG_CD = 'EN'
+      
+			WHERE c.CODE_ID = :codeId and c.CODE_TYPE = :codeType
+		]]>
+		</query>
+		<parameter name="codeId" required="true"/>
+		<parameter name="codeType" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_INSERT_CODEBOOK" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			INSERT INTO tp_codebook
+			(CODE_TYPE, CODE_ID, PARENT_TYPE, PARENT_ID, CENTER_CD, 
+				ETC1, ETC2, ETC3, ETC4, ETC5, 
+				SORT_KEY, USE_YN, REG_ID, REG_TIME, CHG_ID, CHG_TIME, 
+				CHANNEL) 
+			VALUES(:codeType, :codeId, :parentType, :parentId, :centerCd, 
+				:etc1,:etc2,:etc3,:etc4,:etc5,
+				:sortKey, :useYn, :createBy, GETDATE(), :createBy, GETDATE(), 
+				:channel)
+		]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+		<parameter name="codeId" required="true"/>
+		<parameter name="parentType" required="true"/>
+		<parameter name="parentId" required="true"/>
+		<parameter name="createBy" required="true"/>
+		<parameter name="centerCd" required="false" nullable="true"/>
+		<parameter name="etc1" required="false" nullable="true"/>
+		<parameter name="etc2" required="false" nullable="true"/>
+		<parameter name="etc3" required="false" nullable="true"/>
+		<parameter name="etc4" required="false" nullable="true"/>
+		<parameter name="etc5" required="false" nullable="true"/>
+		<parameter name="sortKey" required="false" nullable="true"/>
+		<parameter name="useYn" required="false" nullable="true"/>
+		<parameter name="channel" required="false" nullable="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_INSERT_CODEBOOK_LANG" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_CODEBOOK_LANG (CODE_TYPE, CODE_ID, LANG_CD, CODE_NAME, REG_ID, REG_DT, CHG_ID, CHG_DT) 
+			VALUES (:codeType, :codeId, :langCd, :codeName, :createBy, GETDATE(), :createBy, GETDATE())
+		]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+		<parameter name="codeId" required="true"/>
+		<parameter name="langCd" required="true"/>
+		<parameter name="codeName" required="true"/>
+		<parameter name="createBy" required="true"/>
+	</sql-service>
+
+	<sql-service name="CODEBOOK.SQL_UPDATE_CODEBOOK" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			UPDATE tp_codebook 
+			SET 
+				PARENT_TYPE=:parentType, PARENT_ID=:parentId, CENTER_CD=:centerCd, 
+				ETC1=:etc1, ETC2=:etc2, ETC3=:etc3, ETC4=:etc4, ETC5=:etc5, SORT_KEY=:sortKey, USE_YN=:useYn, 
+				CHG_ID=:updateBy, CHG_TIME=GETDATE(), CHANNEL=:channel
+			WHERE 
+				CODE_ID=:codeId and CODE_TYPE=:codeType
+		]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+		<parameter name="codeId" required="true"/>
+		<parameter name="parentType" required="true"/>
+		<parameter name="parentId" required="true"/>
+		<parameter name="updateBy" required="true"/>
+		<parameter name="centerCd" required="false" nullable="true"/>
+		<parameter name="etc1" required="false" nullable="true"/>
+		<parameter name="etc2" required="false" nullable="true"/>
+		<parameter name="etc3" required="false" nullable="true"/>
+		<parameter name="etc4" required="false" nullable="true"/>
+		<parameter name="etc5" required="false" nullable="true"/>
+		<parameter name="sortKey" required="false" nullable="true"/>
+		<parameter name="useYn" required="false" nullable="true"/>
+		<parameter name="channel" required="false" nullable="true"/>
+		<parameter name="codeNameTh" required="false" nullable="true"/>
+		<parameter name="codeNameEn" required="false" nullable="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_UPDATE_CODEBOOK_LANG" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_CODEBOOK_LANG SET CODE_NAME = :codeName, CHG_ID = :updateBy, CHG_DT = GETDATE()
+			WHERE CODE_TYPE = :codeType AND CODE_ID = :codeId AND LANG_CD = :langCd
+		]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+		<parameter name="codeId" required="true"/>
+		<parameter name="langCd" required="true"/>
+		<parameter name="codeName" required="true"/>
+		<parameter name="updateBy" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_FIND_CODEBOOK_ALL_BY_LANG" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			
+			select cbl.CODE_NAME, cb.*
+	      	from TP_CODEBOOK cb
+    	  	inner join TP_CODEBOOK_LANG cbl on cbl.CODE_ID = cb.CODE_ID and cbl.CODE_TYPE = cb.CODE_TYPE
+      		where cbl.LANG_CD = :langCd
+		]]>
+		</query>
+		<parameter name="langCd" required="true"/>
+	</sql-service>
+	
+	
+	
+	<sql-service name="CODEBOOK.SQL_FIND_LIST_CODEBOOK_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			select c.*
+			from tp_codebook c
+			WHERE c.CHANNEL='M'
+			
+			${#SYNC_DATE?.text} 
+			
+			LIMIT :OFFSET,:ROW_PER_PAGE
+		]]>
+		</query>
+		<parameter name="SYNC_DATE"> AND (c.CHG_TIME >= :SYNC_DATE OR c.REG_TIME >= :SYNC_DATE) </parameter>
+		<parameter name="OFFSET" required="true"/>
+		<parameter name="ROW_PER_PAGE" required="true"/>
+	</sql-service>
+	
+	
+	<sql-service name="CODEBOOK.SQL_FIND_TOTALROW_CODEBOOK_BY_SYNC_DATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			select count(*)
+			from tp_codebook c
+			WHERE c.CHANNEL='M'
+			${#SYNC_DATE?.text} 
+			
+		]]>
+		</query>
+		<parameter name="SYNC_DATE"> AND (c.CHG_TIME >= :SYNC_DATE OR c.REG_TIME >= :SYNC_DATE) </parameter>
+	</sql-service>
+	
+
+	<sql-service name="CODEBOOK.SQL_FIND_CODEBOOK_BY_CODE_TYPE" type="named-parameter" showSql="false">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT 
+			CODE_TYPE, 
+			CODE_ID, 
+			CODE_NAME, 
+			PARENT_ID as PARENT_TYPE, 
+			ETC1 as ETC_1, 
+			ETC2 as ETC_2, 
+			SORT_KEY
+			
+			FROM TP_CODEBOOK
+			
+			WHERE CODE_TYPE = :codeType
+				AND USE_YN ='Y'
+		]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+	</sql-service>
+	
+	
+			
+	<sql-service name="CODEBOOK.SQL_FIND_CODEBOOK_BY_CODE_TYPE_AND_PARENT" type="named-parameter" showSql="false">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT 
+				CODE_TYPE, 
+				CODE_ID, 
+				CODE_NAME, 
+				PARENT_ID as PARENT_TYPE, 
+				ETC1, 
+				ETC2, 
+				SORT_KEY
+			
+			FROM TP_CODEBOOK
+			
+			WHERE CODE_TYPE = :codeType AND PARENT_ID = :parentId
+				AND USE_YN ='Y'
+		]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+		<parameter name="parentId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_FIND_CODEBOOK_LANG_BY_CODE_TYPE_AND_PARENT" type="named-parameter" showSql="false">
+		<description></description>		
+		<query><![CDATA[	
+		SELECT cl.CODE_NAME, cl.LANG_CD
+	   	FROM TP_CODEBOOK c
+	    INNER JOIN TP_CODEBOOK_LANG cl on cl.CODE_ID = c.CODE_ID and cl.CODE_TYPE = c.CODE_TYPE
+	    WHERE c.CODE_TYPE = :codeType
+	    AND c.CODE_ID = :codeId
+      ]]>
+		</query>
+		<parameter name="codeType" required="true"/>
+		<parameter name="codeId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_COUNT_CODEBOOK_BY_CODE_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT COUNT(1) FROM TP_CODEBOOK c
+			WHERE c.CODE_ID = :codeId and c.CODE_TYPE = :codeType
+		]]>
+		</query>
+		<parameter name="codeId" required="true"/>
+		<parameter name="codeType" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_COUNT_CODEBOOK_BY_CODE_ID_AND_CODE_TYPE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT c.*, cl.CODE_NAME AS CODE_NAME
+			FROM TP_CODEBOOK c
+			INNER JOIN TP_CODEBOOK_LANG cl on c.CODE_TYPE = cl.CODE_TYPE 
+			  and c.CODE_ID = cl.CODE_ID 
+			  and cl.LANG_CD = :langCd
+			WHERE c.CODE_TYPE = :codeType
+			AND c.USE_YN = 'Y'
+		]]>
+		</query>
+		<parameter name="langCd" required="true"/>
+		<parameter name="codeType" required="true"/>
+	</sql-service>
+	
+	<sql-service name="CODEBOOK.SQL_GET_CODEBOOK_WITH_DISABLED" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT c.*, cl.CODE_NAME AS CODE_NAME
+			FROM TP_CODEBOOK c
+			INNER JOIN TP_CODEBOOK_LANG cl on c.CODE_TYPE = cl.CODE_TYPE 
+			  and c.CODE_ID = cl.CODE_ID 
+			  and cl.LANG_CD = :langCd
+			WHERE c.CODE_TYPE = :codeType
+		
+		]]>
+		</query>
+		<parameter name="langCd" required="true"/>
+		<parameter name="codeType" required="true"/>
+	</sql-service>
+	
+</query-collection>

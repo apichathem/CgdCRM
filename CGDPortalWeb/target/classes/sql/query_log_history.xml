@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="LOG_HISTORY.SQL_SEARCH_HISTORY_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			SELECT LOG_HIST_ID, LOGIN_ID, SOURCE_IP, STATUS, BROWSER, PLATFORM , 
+			CONVERT(VARCHAR(10), LOGIN_TIME, 103) + ' '  + convert(VARCHAR(5), GETDATE(), 14) AS LOGIN_TIME, 
+			FROM TP_USR_LOGIN_HISTORY
+			WHERE LOGIN_ID = :loginId	
+		]]>
+		</query>
+		<parameter name="userId" required="true" />
+	</sql-service>
+	
+	<sql-service name="LOG_HISTORY.SQL_INSERT_HISTORY_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			INSERT INTO TP_USR_LOGIN_HISTORY (
+			   LOGIN_ID
+			  ,LOGIN_TIME
+			  ,SOURCE_IP
+			  ,STATUS
+			  ,BROWSER
+			  ,PLATFORM
+			) VALUES (
+			   :loginId
+			  ,:loginTime
+			  ,:sourceIp
+			  ,:status
+			  ,:browser
+			  ,:platform
+			)
+		]]>
+		</query>
+		<parameter name="loginId" required="true" />
+		<parameter name="loginTime" required="true" />
+		<parameter name="sourceIp" required="false" />
+		<parameter name="status" required="true" />
+		<parameter name="browser" required="false" />
+		<parameter name="platform" required="false" />
+	</sql-service>
+	
+	<sql-service name="LOG_HISTORY.SQL_LOGIN_STATIC" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			SELECT datepart(hour, LOGIN_TIME) AS PERIOD, COUNT(LOGIN_ID) AS USER_ACCESS
+			FROM TP_USR_LOGIN_HISTORY
+			WHERE convert(varchar(10), LOGIN_TIME, 102) 
+			    = convert(varchar(10), :viewDate, 102)
+			GROUP BY datepart(hour, LOGIN_TIME), convert(varchar(10), LOGIN_TIME, 102) 
+			ORDER BY datepart(hour, LOGIN_TIME)	
+		]]>
+		</query>
+		<parameter name="viewDate" required="true" />
+	</sql-service>
+	
+</query-collection>

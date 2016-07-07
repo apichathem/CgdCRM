@@ -1,0 +1,226 @@
+/* here you can put your own css to customize and override the theme */
+/*.fieldset {
+	display: block;
+	-webkit-margin-start: 2px;
+	-webkit-margin-end: 2px;
+	-webkit-padding-before: 0.35em;
+	-webkit-padding-start: 0.75em;
+	-webkit-padding-end: 0.75em;
+	-webkit-padding-after: 0.625em;
+	border: 2px groove threedface;
+	border-image-source: initial;
+	border-image-slice: initial;
+	border-image-width: initial;
+	border-image-outset: initial;
+	border-image-repeat: initial;
+	min-width: -webkit-min-content;
+	padding:5px;
+}
+.legend {
+	display: block;
+	width: auto;
+	font-size:12px;
+	margin-bottom:0;
+	-webkit-padding-start: 2px;
+	-webkit-padding-end: 2px;
+	border: none;
+	border-image-source: initial;
+	border-image-slice: initial;
+	border-image-width: initial;
+	border-image-outset: initial;
+	border-image-repeat: initial;
+}*/
+
+.masktime{
+	width:55px !important;
+}
+
+.form-actions.fluid {
+	padding: 3px 0;
+}
+.form-actions.right {
+	padding-left: 0;
+	padding-right: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	text-align: right;
+}
+
+.blue-border {
+	border: 1px solid #4b8df8;
+	width: 35%;
+	float: right;
+	margin-right: 15px;
+	padding-top: 5px;
+}
+.striped {
+	margin: 0;
+	padding: 0;
+}
+.portlet > .portlet-title {  
+	margin-bottom: -10px;
+	border-bottom: 0px solid #eee;
+} 
+
+/* Gritter message */
+.gritter-blue .gritter-item,
+.gritter-blue .gritter-bottom,
+.gritter-blue .gritter-top {
+	background: url(../plugins/gritter/images/gritter-blue.png) no-repeat scroll left -40px rgba(0, 0, 0, 0) !important;
+	
+}
+.gritter-blue .gritter-close {
+    background: url(../plugins/gritter/images/gritter-blue.png) no-repeat scroll left top rgba(0, 0, 0, 0) !important;
+    color: #FFFF00;
+}
+.gritter-blue .gritter-title {
+    text-shadow: none;
+}
+.gritter-red .gritter-item,
+.gritter-red .gritter-bottom,
+.gritter-red .gritter-top {
+	background: url(../plugins/gritter/images/gritter-red.png) no-repeat scroll left -40px rgba(0, 0, 0, 0) !important;
+}
+.gritter-red .gritter-close {
+    background: url(../plugins/gritter/images/gritter-red.png) no-repeat scroll left top rgba(0, 0, 0, 0) !important;
+    color: #FFFF00;
+}
+.gritter-red .gritter-title {
+    text-shadow: none;
+}
+
+div.growlUI {
+}
+div.growlUI h1, div.growlUI h2, div.growlUI h3, div.growlUI h4 {
+   	text-align: left
+}
+
+.fa.red {
+	color: #d84a38;  
+  	text-shadow: none;	
+}
+
+.no-select {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+table{
+	 border-collapse: separate;
+}
+
+.dataTables_processing {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 125px;
+  margin-left: 0;
+  padding: 0px;
+  text-align: center;
+  color: #333;
+  font-size: 13px;
+  border: 0;
+  background-color: inherit;  
+  vertical-align: middle;
+  -webkit-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+     -moz-box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);  
+  z-index: 20000;
+}
+
+.modal-header {
+	background-color: rgb(66, 139, 202);
+/* 	background-color: #1d943b; */
+	color: #FFFFFF;
+	padding: 2px 1px 5px 20px;
+}
+.close {
+	background-image: url("../img/cross.png") !important;
+	  background-size: 10px 10px;
+	  text-indent: 0;
+	  height: 10px;
+	font-size:30px;
+}
+
+button.close{
+	margin-right: 15px;
+}
+
+table > thead > tr > th {
+    text-align: center;
+    padding: 0px;
+}
+.dataTable > thead > tr > th.sorting, .dataTable > thead > tr > th.sorting_asc, .dataTable > thead > tr > th.sorting_desc {
+    padding-right: 5px;
+}
+
+/*
+for set align text in datatable row
+exam. "sClass": "tdCenter" 
+*/
+.tdRight{
+  text-align: right;
+}
+
+.tdLeft{
+   text-align: left;
+}
+
+.tdCenter{
+  text-align: center;
+}
+
+/* For appearance */
+.sticky-wrap {
+	overflow-x: auto;
+	overflow-y: hidden;
+	position: relative;
+	margin: 3em 0;
+	width: 100%;
+}
+.sticky-wrap .sticky-thead,
+.sticky-wrap .sticky-col,
+.sticky-wrap .sticky-intersect {
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	transition: all .125s ease-in-out;
+	z-index: 50;
+	width: auto; /* Prevent table from stretching to full size */
+}
+	.sticky-wrap .sticky-thead {
+		box-shadow: 0 0.25em 0.1em -0.1em rgba(0,0,0,.125);
+		z-index: 100;
+		width: 100%; /* Force stretch */
+	}
+	.sticky-wrap .sticky-intersect {
+		opacity: 1;
+		z-index: 150;
+
+	}
+		.sticky-wrap .sticky-intersect th {
+			background-color: #666;
+			color: #eee;
+		}
+.sticky-wrap td,
+.sticky-wrap th {
+	box-sizing: border-box;
+}
+
+/* Not needed for sticky header/column functionality */
+td.user-name {
+	text-transform: capitalize;
+}
+.sticky-wrap.overflow-y {
+	overflow-y: auto;
+	max-height: 50vh;
+}
+
+.has-error {
+	color:red;
+}

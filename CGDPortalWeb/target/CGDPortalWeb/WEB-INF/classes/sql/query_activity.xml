@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="ACTIVITY.SQL_SEARCH_ACTIVITY" type="named-parameter"
+		showSql="true">
+		<description></description>
+		<query><![CDATA[	
+		
+			SELECT	 ACT.ACT_NUMBER	AS	actNumber
+				,ACT.ACT_GROUP AS actGroup
+				,ACT.REF_DOC_NO	AS	refDocNo	
+				,ACT.ATTEND_TO	AS	attendTo	
+				,ACT.TITLE	AS	title	
+				,ACT.TYPE_CD	AS	typeCd	
+				,ACT.SUB_TYPE_CD	AS	subTypeCd	
+				,ACT.DESCRIPTION	AS	description	
+				,ACT.PHONE_NO	AS	phoneNo	
+				,ACT.SMS_NO	AS	smsNo	
+				,ACT.FAX_NO	AS	faxNo	
+				,ACT.EMAIL	AS	email	
+				,ACT.ADDRESS	AS	address	
+				,ACT.STATUS_CD	AS	statusCd	
+				,ACT.OWNER_ID	AS	ownerId	
+				,ACT.OWNER_DEPT_CODE	AS	ownerDeptCode	
+				,ACT.OPENED_DT	AS	openedDt	
+				,ACT.DUE_DT	AS	dueDt	
+				,ACT.OPER_DT	AS	operDt	
+				,ACT.CLOSED_DT	AS	closedDt	
+				,ACT.REG_ID	AS	regId	
+				,ACT.REG_DT	AS	regDt	
+				,ACT.CHG_ID	AS	chgId	
+				,ACT.CHG_DT	AS	chgDt	
+				,CB1.CODE_NAME		AS	activityTypeName 	
+				,CB2.CODE_NAME 		AS	activityStatusName			
+				, CASE CB3.CODE_NAME
+		         WHEN 'No Group' THEN ''
+		         ELSE CB3.CODE_NAME end AS  activityGroup			
+				,ISNULL(EMP1.FIRST_NAME,'')+' '+ISNULL(EMP1.LAST_NAME,'')	AS	ownerName	
+				,ACT.OWNER_ID as assignToId
+				,DEP.DEPT_NAME		AS	deptName
+				,ISNULL(EMP2.FIRST_NAME, '')+' '+ISNULL(EMP2.LAST_NAME,'') AS	regName	
+				,ISNULL(EMP3.FIRST_NAME, '')+' '+ISNULL(EMP3.LAST_NAME,'') 	AS	chgName	
+				,CONVERT(VARCHAR, ACT.REG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.REG_DT, 108) AS	regDatetime	
+				,CONVERT(VARCHAR, ACT.CHG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.CHG_DT, 108) AS	chgDatetime	
+													
+			FROM	TP_ACTIVITY ACT
+							
+				LEFT	OUTER JOIN TP_CODEBOOK_LANG CB1 ON ACT.TYPE_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'ACT_TYPE' AND CB1.LANG_CD = :langCd						
+				LEFT	OUTER JOIN TP_CODEBOOK_LANG CB2 ON ACT.STATUS_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'ACT_STATUS' AND CB2.LANG_CD = :langCd
+				LEFT	OUTER JOIN TP_CODEBOOK_LANG CB3 ON ACT.ACT_GROUP = CB3.CODE_ID AND CB3.CODE_TYPE = 'ACT_GROUP' AND CB3.LANG_CD = :langCd
+				LEFT	OUTER JOIN TP_USR_MASTER USR1 ON ACT.OWNER_ID = USR1.USER_ID										
+				LEFT	OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID										
+				LEFT	OUTER JOIN TP_DEPARTMENT DEP ON ACT.OWNER_DEPT_CODE = DEP.DEPT_CODE										
+				LEFT	OUTER JOIN TP_USR_MASTER USR2 ON ACT.REG_ID = USR2.USER_ID										
+				LEFT	OUTER JOIN TP_EMPLOYEE EMP2 ON USR2.EMP_ID = EMP2.EMP_ID										
+				LEFT	OUTER JOIN TP_USR_MASTER USR3 ON ACT.CHG_ID = USR3.USER_ID										
+				LEFT	OUTER JOIN TP_EMPLOYEE EMP3 ON USR3.EMP_ID = EMP3.EMP_ID										
+											
+			WHERE 	1=1
+			${#ownerGroup?.text}
+			${#actNumber?.text}
+			${#actGroup?.text}
+			${#typeCd?.text}
+			${#statusCd?.text}
+			${#ownerId?.text}
+			${#regDtForm?.text}
+			${#regDtTo?.text}
+			${#dueDtForm?.text}
+			${#dueDtTo?.text}
+			
+			ORDER BY ACT.REG_DT DESC
+			
+		]]>
+		</query>
+		
+		<parameter name="actNumber" suffix="%">AND ACT.ACT_NUMBER LIKE :actNumber</parameter>
+		<parameter name="actGroup">AND ACT.ACT_GROUP = :actGroup</parameter>
+		<parameter name="typeCd">AND ACT.TYPE_CD = :typeCd</parameter>
+		<parameter name="statusCd">AND ACT.STATUS_CD = :statusCd</parameter>
+		<parameter name="ownerId">AND ACT.OWNER_ID = :ownerId</parameter>
+		<parameter name="regDtForm">AND ACT.REG_DT >= :regDtForm</parameter>
+		<parameter name="regDtTo">AND ACT.REG_DT &lt;= :regDtTo</parameter>
+		<parameter name="dueDtForm">AND ACT.DUE_DT >= :dueDtForm</parameter>
+		<parameter name="dueDtTo">AND ACT.DUE_DT &lt;= :dueDtTo</parameter>
+		<parameter name="ownerGroup">AND OWNER_ID IN (:ownerGroup) </parameter>
+		<parameter name='langCd' required="true"/>
+	</sql-service>
+	
+	<sql-service name="ACTIVITY.SQL_SEARCH_ACTIVITY_DETAIL" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+		
+			SELECT			
+				ACT.ACT_NUMBER	AS	actNumber	
+				,ACT.REF_DOC_NO	AS	refDocNo	
+				,ACT.ATTEND_TO	AS	attendTo	
+				,ACT.TITLE	AS	title	
+				,ACT.TYPE_CD	AS	typeCd	
+				,ACT.SUB_TYPE_CD	AS	subTypeCd	
+				,ACT.DESCRIPTION	AS	description	
+				,ACT.PHONE_NO	AS	phoneNo	
+				,ACT.SMS_NO	AS	smsNo	
+				,ACT.FAX_NO	AS	faxNo	
+				,ACT.EMAIL	AS	email	
+				,ACT.ADDRESS	AS	address	
+				,ACT.STATUS_CD	AS	statusCd	
+				,ACT.OWNER_ID	AS	ownerId	
+				,ACT.OWNER_DEPT_CODE	AS	ownerDeptCode	
+				,ACT.OPENED_DT	AS	openedDt	
+				,ACT.DUE_DT	AS	dueDt	
+				,ACT.OPER_DT	AS	operDt	
+				,ACT.CLOSED_DT	AS	closedDt	
+				,ACT.REG_ID	AS	regId	
+				,ACT.REG_DT	AS	regDt	
+				,ACT.CHG_ID	AS	chgId	
+				,ACT.CHG_DT	AS	chgDt	
+				,CB1.CODE_NAME		AS	activityTypeName 	
+				,CB2.CODE_NAME 		AS	activityStatusName	
+				,ISNULL(EMP1.FIRST_NAME,'')+' '+ISNULL(EMP1.LAST_NAME,'')	AS	ownerName	
+				,DEP.DEPT_NAME		AS	deptName	
+				,ISNULL(EMP2.FIRST_NAME, '')+' '+ISNULL(EMP2.LAST_NAME,'') AS	regName	
+				,ISNULL(EMP3.FIRST_NAME, '')+' '+ISNULL(EMP3.LAST_NAME,'') 	AS	chgName	
+				,CONVERT(VARCHAR, ACT.REG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.REG_DT, 108) AS	regDatetime	
+				,CONVERT(VARCHAR, ACT.CHG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.CHG_DT, 108) AS	chgDatetime	
+			FROM	TP_ACTIVITY ACT											
+					
+			LEFT	OUTER JOIN TP_CODEBOOK_LANG CB1 ON ACT.TYPE_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'ACT_TYPE' AND CB1.LANG_CD = :langCd										
+			LEFT	OUTER JOIN TP_CODEBOOK_LANG CB2 ON ACT.STATUS_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'ACT_STATUS' AND CB2.LANG_CD = :langCd																				
+			LEFT	OUTER JOIN TP_USR_MASTER USR1 ON ACT.OWNER_ID = USR1.USER_ID											
+			LEFT	OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID											
+			LEFT	OUTER JOIN TP_DEPARTMENT DEP ON ACT.OWNER_DEPT_CODE = DEP.DEPT_CODE											
+			LEFT	OUTER JOIN TP_USR_MASTER USR2 ON ACT.REG_ID = USR2.USER_ID											
+			LEFT	OUTER JOIN TP_EMPLOYEE EMP2 ON USR2.EMP_ID = EMP2.EMP_ID											
+			LEFT	OUTER JOIN TP_USR_MASTER USR3 ON ACT.CHG_ID = USR3.USER_ID											
+			LEFT	OUTER JOIN TP_EMPLOYEE EMP3 ON USR3.EMP_ID = EMP3.EMP_ID									
+											
+			WHERE 	1=1 
+			
+			${#actNumber?.text}
+			
+		]]>
+		</query>
+		<parameter name="actNumber">AND ACT.ACT_NUMBER = :actNumber
+		<parameter name='langCd' required="true"/>
+		</parameter>
+	</sql-service>
+	
+	<sql-service name="ACTIVITY.SQL_SEARCH_DOCUMENT_ACTIVITY"	type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+		
+			SELECT	
+				 RA.ATT_ID 		 AS attId
+				,RA.ATT_NAME	 AS actDocumentName			
+				,AT.FILE_NAME	 AS actKnowledgeBase									
+				,RA.SEND_DOC_FLG AS actSendDocFlg
+				,RA.DESCP		 AS actDescription
+				,RA.REF_DOC_TYPE AS actRefDocType
+				,RA.REL_ATT_ID   AS relAttId
+			FROM TP_REL_ATT RA											
+			LEFT OUTER JOIN TP_ATT AT ON RA.ATT_ID = AT.ATT_ID										
+			WHERE RA.REF_DOC_NO = ${#actDocNo?.text} 	
+			
+		]]>
+		</query>
+		
+		<parameter name="actDocNo">:actDocNo</parameter>
+	</sql-service>
+	
+	<sql-service name="ACTIVITY.SQL_SEARCH_ACTIVITY_DETAIL_BY_ACT_NUMBER" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+		
+			SELECT	 ACT.ACT_NUMBER	AS	actNumber	
+				,ACT.REF_DOC_NO	AS	refDocNo	
+				,ACT.ATTEND_TO	AS	attendTo	
+				,ACT.TITLE	AS	title	
+				,ACT.TYPE_CD	AS	typeCd	
+				,ACT.SUB_TYPE_CD	AS	subTypeCd	
+				,ACT.DESCRIPTION	AS	description	
+				,ACT.PHONE_NO	AS	phoneNo	
+				,ACT.SMS_NO	AS	smsNo	
+				,ACT.FAX_NO	AS	faxNo	
+				,ACT.EMAIL	AS	email	
+				,ACT.ADDRESS	AS	address	
+				,ACT.STATUS_CD	AS	statusCd	
+				,ACT.OWNER_ID	AS	ownerId	
+				,ACT.OWNER_DEPT_CODE	AS	ownerDeptCode	
+				,ACT.OPENED_DT	AS	openedDt	
+				,ACT.DUE_DT	AS	dueDt	
+				,ACT.OPER_DT	AS	operDt	
+				,ACT.CLOSED_DT	AS	closedDt	
+				,ACT.REG_ID	AS	regId	
+				,ACT.REG_DT	AS	regDt	
+				,ACT.CHG_ID	AS	chgId	
+				,ACT.CHG_DT	AS	chgDt										
+				, CB1.CODE_NAME AS activityTypeName 										
+				, CB2.CODE_NAME AS activityStatusName										
+				, ISNULL(EMP1.FIRST_NAME,'')+' '+ISNULL(EMP1.LAST_NAME,'') AS ownerName										
+				, DEP.DEPT_NAME										
+				, ISNULL(EMP2.FIRST_NAME, '')+' '+ISNULL(EMP2.LAST_NAME,'') AS REG_NAME										
+				, ISNULL(EMP3.FIRST_NAME, '')+' '+ISNULL(EMP3.LAST_NAME,'') AS CHG_NAME										
+				, CONVERT(VARCHAR, ACT.REG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.REG_DT, 108) AS REG_DATETIME										
+				, CONVERT(VARCHAR, ACT.CHG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.CHG_DT, 108) AS CHG_DATETIME										
+			FROM	TP_ACTIVITY ACT									
+				
+			LEFT	OUTER JOIN TP_CODEBOOK_LANG CB1 ON ACT.TYPE_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'ACT_TYPE' AND CB1.LANG_CD = :langCd							
+			LEFT	OUTER JOIN TP_CODEBOOK_LANG CB2 ON ACT.STATUS_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'ACT_STATUS' AND CB2.LANG_CD = :langCd									
+			LEFT	OUTER JOIN TP_USR_MASTER USR1 ON ACT.OWNER_ID = USR1.USER_ID										
+			LEFT	OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID										
+			LEFT	OUTER JOIN TP_DEPARTMENT DEP ON ACT.OWNER_DEPT_CODE = DEP.DEPT_CODE										
+			LEFT	OUTER JOIN TP_USR_MASTER USR2 ON ACT.REG_ID = USR2.USER_ID										
+			LEFT	OUTER JOIN TP_EMPLOYEE EMP2 ON USR2.EMP_ID = EMP2.EMP_ID										
+			LEFT	OUTER JOIN TP_USR_MASTER USR3 ON ACT.CHG_ID = USR3.USER_ID										
+			LEFT	OUTER JOIN TP_EMPLOYEE EMP3 ON USR3.EMP_ID = EMP3.EMP_ID										
+			WHERE 	1=1
+			${#actNumber?.text}	
+		]]>
+		</query>
+			<parameter name="actNumber">AND ACT.ACT_NUMBER = :actNumber</parameter>
+			<parameter name='langCd' required="true"/>
+	</sql-service>
+
+	<sql-service name="ACTIVITY.SQL_FOR_INSERT_ACTIVITY" type="named-parameter"
+		showSql="true">
+		<description></description>
+		<query><![CDATA[
+				INSERT INTO TP_ACTIVITY
+					(
+						ACT_NUMBER,
+						ACT_GROUP,
+						REF_DOC_NO,
+						ATTEND_TO,
+						TITLE,
+						TYPE_CD,
+						SUB_TYPE_CD,
+						DESCRIPTION,
+						PHONE_NO,
+						SMS_NO,
+						FAX_NO,
+						EMAIL,
+						ADDRESS,
+						STATUS_CD,
+						OWNER_ID,
+						OWNER_DEPT_CODE,
+						OPENED_DT,
+						DUE_DT,
+						OPER_DT,
+						CLOSED_DT,
+						REG_ID,
+						REG_DT
+					)
+				VALUES
+					(
+						:actNumber,	
+						'ACT',	        
+						:refDocNo,	        
+						:attendTo,	        
+						:title,	                
+						:typeCd,	                
+						:subTypeCd,	        
+						:description,	        
+						:phoneNo,	        
+						:smsNo,	                
+						:faxNo,	                
+						:email,	                
+						:address,	        
+						:statusCd,	        
+						:ownerId,	        
+						:ownerDeptCode,	
+						:openedDt,	        
+						:dueDt,	                
+						:operDt,	                
+						:closedDt,	        
+						:regId,	                
+						:regDt	                
+					)
+		]]>
+		</query>
+
+		<parameter name="actNumber" required="false" />
+		<parameter name="activityGroup" required="false" />
+		<parameter name="refDocNo" required="false" />
+		<parameter name="attendTo" required="false" />
+		<parameter name="title" required="false" />
+		<parameter name="typeCd" required="false" />
+		<parameter name="subTypeCd" required="false" />
+		<parameter name="description" required="false" />
+		<parameter name="phoneNo" required="false" />
+		<parameter name="smsNo" required="false" />
+		<parameter name="faxNo" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="address" required="false" />
+		<parameter name="statusCd" required="false" />
+		<parameter name="ownerId" required="false" />
+		<parameter name="ownerDeptCode" required="false" />
+		<parameter name="openedDt" required="false" />
+		<parameter name="dueDt" required="false" />
+		<parameter name="operDt" required="false" />
+		<parameter name="closedDt" required="false" />
+		<parameter name="regId" required="false" />
+		<parameter name="regDt" required="false" />
+	</sql-service>
+
+	<sql-service name="ACTIVITY.SQL_UPDATE_ACTIVITY" type="named-parameter"
+		showSql="true">
+		<query><![CDATA[
+			 
+			UPDATE TP_ACTIVITY
+			SET
+				REF_DOC_NO=:refDocNo,
+				ATTEND_TO=:attendTo,
+				TITLE=:title,
+				TYPE_CD=:typeCd,
+				SUB_TYPE_CD=:subTypeCd,
+				DESCRIPTION=:description,
+				PHONE_NO=:phoneNo,
+				SMS_NO=:smsNo,
+				FAX_NO=:faxNo,
+				EMAIL=:email,
+				ADDRESS=:address,
+				STATUS_CD=:statusCd,
+				OWNER_ID=:ownerId,
+				OWNER_DEPT_CODE=:ownerDeptCode,
+				DUE_DT=:dueDt,
+				OPER_DT=:operDt,
+				CLOSED_DT=:closedDt,
+				CHG_ID=:chgId,
+				CHG_DT=:chgDt 
+			WHERE ACT_NUMBER = :actNumber
+		]]>
+		</query>
+
+		<parameter name="actNumber" required="false" />
+		<parameter name="refDocNo" required="false" />
+		<parameter name="attendTo" required="false" />
+		<parameter name="title" required="false" />
+		<parameter name="typeCd" required="false" />
+		<parameter name="subTypeCd" required="false" />
+		<parameter name="description" required="false" />
+		<parameter name="phoneNo" required="false" />
+		<parameter name="smsNo" required="false" />
+		<parameter name="faxNo" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="address" required="false" />
+		<parameter name="statusCd" required="false" />
+		<parameter name="ownerId" required="false" />
+		<parameter name="ownerDeptCode" required="false" />
+		<parameter name="dueDt" required="false" />
+		<parameter name="operDt" required="false" />
+		<parameter name="closedDt" required="false" />
+		<parameter name="chgId" required="false" />
+		<parameter name="chgDt" required="false" />
+
+	</sql-service>
+	
+	<sql-service name="ACTIVITY.SQL_INSERT_TPATT" type="named-parameter" showSql="true">
+	<description>Insert Table TP_ATT and after success return key att_id </description>		
+	<query><![CDATA[
+		INSERT INTO TP_ATT (
+					 FILE_PATH
+                    ,[FILE_NAME]
+                    ,FILE_EXTENSION
+                    ,FILE_TYPE
+                    ,ACTIVE_FLG
+                    ,ATT_TYPE
+                    ,FILE_SIZE
+                    ,REG_ID
+                    ,REG_DT
+    
+                  ) VALUES (
+					 :filePath
+			        ,:fileName
+			        ,:fileExtension
+			        ,:fileType
+			        ,:activeFlg
+			        ,:attType
+			        ,:fileSize
+			        ,:regId
+			        ,:regDt
+			      )
+				        
+		]]>
+		</query>
+		
+		<parameter name="filePath" required="true"/>
+        <parameter name="fileName" required="true"/>
+        <parameter name="fileExtension" required="true"/>
+        <parameter name="fileType" required="true"/>
+        <parameter name="activeFlg" required="true"/>
+    	<parameter name="attType" required="true"/>
+        <parameter name="fileSize" required="true"/>
+        <parameter name="regId" required="true"/>
+        <parameter name="regDt" required="true"/>
+	</sql-service>
+	
+	<sql-service name="ACTIVITY.SQL_INSERT_TPRELATT" type="named-parameter" showSql="true">
+	<description>Insert Table TP_REL_ATT and after success return key att_id </description>		
+	<query><![CDATA[
+			INSERT INTO TP_REL_ATT (
+					   REF_DOC_TYPE
+                      ,REF_DOC_NO
+                      ,ATT_ID
+                      ,ATT_NAME
+                      ,DESCP
+                      ,REG_ID
+                      ,REG_TIME
+                      ,SEND_DOC_FLG
+            )VALUES (
+                      :refDocType
+                      ,:refDocNo
+                      ,:attId
+                      ,:attName
+                      ,:descp
+                      ,:regId
+                      ,:regTime
+                      ,:sendDocFlg
+                      )
+				        
+		]]>
+		</query>
+		
+			<parameter name="refDocType" required="true"/>
+		    <parameter name="refDocNo" required="true"/>
+		    <parameter name="attId" required="true"/>
+		    <parameter name="attName" required="true"/>
+		    <parameter name="descp" required="true"/>
+		    <parameter name="regId" required="true"/>
+		    <parameter name="regTime" required="true"/>
+		    <parameter name="sendDocFlg" required="true"/>
+	</sql-service>
+		
+	<sql-service name="ACTIVITY.SQL_DELETENO_ATTECHMENT" type="named-parameter"
+		showSql="true">
+		<description></description>
+		<query><![CDATA[
+		DELETE FROM TP_REL_ATT 
+		WHERE REL_ATT_ID = :relAttId
+		]]>
+		</query>
+		<parameter name="relAttId" required="false" />
+	</sql-service>
+
+	<sql-service name="ACTIVITY.SQL_UPDATE__FLAG_TPRELATT" type="named-parameter"
+		showSql="true">
+		<description></description>
+		<query><![CDATA[
+			UPDATE TP_REL_ATT
+			SET 
+			SEND_DOC_FLG  = :sendDocFlg,
+			CHG_ID		= :chgId,
+			CHG_TIME	= :chgTime
+			WHERE REL_ATT_ID = :relAttId  
+		]]>
+		</query>
+		<parameter name="relAttId" required="false" />
+		<parameter name="sendDocFlg" required="false" />
+		<parameter name="chgId" required="false" />
+		<parameter name="chgTime" required="false" />
+	</sql-service>
+	
+</query-collection>

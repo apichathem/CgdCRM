@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="USER.SQL_LOGIN_BY_USER_NAME" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				M.USER_ID AS USER_ID ,
+                M.LOGIN_ID AS LOGIN_ID,
+                M.PASSWORD ,
+                M.USR_TYPE_CD ,
+                M.PWD_RECENT1 ,
+                M.PWD_RECENT2 ,
+                M.PWD_ERR_CNT ,
+                M.PWD_CHG_DT ,
+                M.CONNECT_IP ,
+                M.LOGIN_YN ,
+                M.LOGIN_MODE ,
+                M.LOGIN_DT ,
+                M.LOGOUT_DT ,
+                M.CUR_LANG ,
+                M.CUR_ERA ,
+                M.LDAP_ID ,
+                M.REPORT_TO_ID ,
+                M.MAC_ADDR ,
+                M.USE_YN ,
+                M.USER_PIC,
+                E.FIRST_NAME,
+                E.LAST_NAME,
+                R.ROLE_ID,
+               	R.ROLE_NAME,
+               	E.DEPARTMENT_CD,
+		        E.POSITION_CD,
+            depCb.CODE_NAME AS DEPARTMENT_NAME,
+            posCb.CODE_NAME AS POSITION_NAME
+		  	FROM TP_USR_MASTER M
+		  	INNER JOIN TP_EMPLOYEE E ON M.EMP_ID = E.EMP_ID
+     	 	INNER JOIN TP_USR_ROLE UR ON UR.[USER_ID] = M.[USER_ID]
+      		INNER JOIN TP_ROLE R ON R.ROLE_ID = UR.ROLE_ID
+      		LEFT JOIN TP_CODEBOOK_LANG posCb ON posCb.CODE_TYPE ='POSITION' AND posCb.CODE_ID = E.POSITION_CD AND posCb.LANG_CD = :langCd
+      		LEFT JOIN TP_CODEBOOK_LANG depCb ON depCb.CODE_TYPE ='DEPARTMENT' AND depCb.CODE_ID = E.DEPARTMENT_CD AND depCb.LANG_CD = :langCd
+		  	WHERE 1=1 
+		  	AND M.LOGIN_ID = :USER_NAME
+		]]>
+		</query>
+		<parameter name="USER_NAME" required="true" />
+		<parameter name="langCd" required="true" />
+	</sql-service>
+	
+	
+	<sql-service name="USER.SQL_LOGIN_BY_USER_NAME_AND_EMAIL" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				USER_ID AS USER_ID ,
+                LOGIN_ID AS USER_NAME,
+                PASSWORD ,
+                USR_TYPE_CD ,
+                PWD_RECENT1 ,
+                PWD_RECENT2 ,
+                PWD_ERR_CNT ,
+                PWD_CHG_DT ,
+                CONNECT_IP ,
+                LOGIN_YN ,
+                LOGIN_MODE ,
+                LOGIN_DT ,
+                LOGOUT_DT ,
+                CUR_LANG ,
+                CUR_ERA ,
+                LDAP_ID ,
+                REPORT_TO_ID ,
+                MAC_ADDR ,
+                USE_YN ,
+                USER_PIC,
+                ROLE_ID,
+                E.*
+		  FROM TP_USR_MASTER M
+		  INNER JOIN TP_AGENT E ON M.AGENT_ID=E.AGENT_ID
+		  WHERE 1=1 AND
+		  
+		  M.LOGIN_ID = :USER_NAME AND E.EMAIL = :EMAIL
+		]]>
+		</query>
+		<parameter name="USER_NAME" required="true" />
+		<parameter name="EMAIL" required="true" />
+	</sql-service>
+	
+	
+	
+	<sql-service name="USER.SQL_FIND_BY_CRITERIA" type="named-parameter" showSql="true">
+		<description>Dialog user </description>		
+		<query><![CDATA[	
+			SELECT
+			  e.EMP_ID,
+		      e.EMP_NO AS AGENT_NO,
+		      e.FIRST_NAME,
+		      e.LAST_NAME,
+		      e.EMAIL, 
+		      m.LOGIN_ID, 
+		      m.USE_YN, 
+		      m.USER_ID,
+		      e.MOBILE_NO,
+			  e.DEPARTMENT_CD,
+			  R.ROLE_ID,
+              R.ROLE_NAME,
+			 depCb.CODE_NAME AS DEPARTMENT_NAME,
+			 posCb.CODE_NAME AS POSITION_NAME
+			  
+		    FROM tp_usr_master m
+			INNER JOIN TP_EMPLOYEE e on m.EMP_ID = e.EMP_ID
+		    INNER JOIN TP_USR_ROLE UR on UR.[USER_ID] = m.[USER_ID]
+			INNER JOIN TP_ROLE R ON R.ROLE_ID = UR.ROLE_ID
+			LEFT JOIN TP_CODEBOOK_LANG posCb ON posCb.CODE_TYPE ='POSITION' AND posCb.CODE_ID = E.POSITION_CD AND posCb.LANG_CD = :langCd
+      		LEFT JOIN TP_CODEBOOK_LANG depCb ON depCb.CODE_TYPE ='DEPARTMENT' AND depCb.CODE_ID = E.DEPARTMENT_CD AND depCb.LANG_CD = :langCd
+			WHERE 1=1
+			--${#agentNo?.text}
+			${#firstName?.text}
+			${#lastName?.text}
+			${#loginId?.text}
+		]]>
+		</query>
+		<parameter name="langCd" required="true" />
+		<parameter name='agentNo' prefix="%" suffix="%"> AND e.EMP_NO like :agentNo</parameter>
+		<parameter name='firstName' prefix="%" suffix="%"> AND e.FIRST_NAME like :firstName</parameter>
+		<parameter name='lastName' prefix="%" suffix="%"> AND e.LAST_NAME like :lastName</parameter>
+		<parameter name='loginId' prefix="%" suffix="%"> AND m.LOGIN_ID like :loginId</parameter>
+	</sql-service>
+	
+	<sql-service name="USER.SQL_FIND_BY_USER_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT e.EMP_ID AS AGENT_ID,
+				e.EMP_NO AS AGENT_NO,
+				e.FIRST_NAME,
+				r.ROLE_ID,
+				e.LAST_NAME, 
+				e.EMAIL, 
+				e.MOBILE_NO, 
+				m.LOGIN_ID, 
+				m.USE_YN, 
+				m.USER_ID, 
+				m.PASSWORD as PASSWORD, 
+				concat(r2.FIRST_NAME,' ',r2.LAST_NAME) as CREATE_BY,
+				--CONVERT(VARCHAR(10), e.REG_DT, 103) + ' '  + convert(VARCHAR(5), GETDATE(), 14) AS CREATE_DATE, 
+				e.REG_DT,
+				concat(c2.FIRST_NAME,' ',c2.LAST_NAME) AS UPDATE_BY, 
+				--CONVERT(VARCHAR(10), e.CHG_DT, 103) + ' '  + convert(VARCHAR(5), GETDATE(), 14) AS UPDATE_DATE, 
+				e.CHG_DT,
+				m.USER_PIC,
+		        e.DEPARTMENT_CD,
+		        e.POSITION_CD,
+            	depCb.CODE_NAME AS DEPARTMENT_NAME,
+            	posCb.CODE_NAME AS POSITION_NAME,
+            	eu.FIRST_NAME + ' ' + eu.LAST_NAME AS REPORT_NAME
+			FROM tp_usr_master m
+			INNER JOIN TP_EMPLOYEE e on m.EMP_ID=e.EMP_ID
+			INNER JOIN TP_USR_ROLE r on r.[USER_ID] = m.[USER_ID]
+      		LEFT OUTER JOIN TP_USR_MASTER u ON u.[USER_ID] = m.REPORT_TO_ID
+      		LEFT OUTER JOIN TP_EMPLOYEE eu ON eu.EMP_ID = u.EMP_ID
+			LEFT JOIN TP_EMPLOYEE r2 on e.REG_ID=r2.EMP_ID
+			LEFT JOIN TP_EMPLOYEE c2 on e.CHG_ID=c2.EMP_ID
+      		LEFT JOIN TP_CODEBOOK_LANG posCb ON posCb.CODE_TYPE ='POSITION' AND posCb.CODE_ID = e.POSITION_CD AND posCb.LANG_CD = :langCd
+      		LEFT JOIN TP_CODEBOOK_LANG depCb ON depCb.CODE_TYPE ='DEPARTMENT' AND depCb.CODE_ID = e.DEPARTMENT_CD AND depCb.LANG_CD = :langCd
+			WHERE m.USER_ID=:USER_ID
+		]]>
+		</query>
+		<parameter name="USER_ID" required="true" />
+		<parameter name="langCd" required="true" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_AGENT_INSERT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[		
+			INSERT INTO TP_EMPLOYEE(FIRST_NAME, LAST_NAME, EMP_NO, EMAIL, MOBILE_NO, REG_ID, REG_DT, CHG_ID, CHG_DT) 
+    		VALUES(:firstName, :lastName, :agentNo, :email, :mobileNo, :createBy, GETDATE(), :createBy, GETDATE());
+		]]>
+		</query>
+		<parameter name="firstName" required="false" nullable="true" />
+		<parameter name="lastName" required="false" nullable="true" />
+		<parameter name="agentNo" required="false" nullable="true" />
+		<parameter name="email" required="false" nullable="true" />
+		<parameter name="mobileNo" required="false" nullable="true" />
+		<parameter name="createBy" required="false" nullable="true" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_USR_INSERT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+    		
+    		BEGIN TRANSACTION
+			BEGIN
+				DECLARE @userId int
+				DECLARE @empId int
+				
+				INSERT INTO TP_EMPLOYEE(FIRST_NAME, LAST_NAME, EMP_NO, EMAIL, MOBILE_NO, DEPARTMENT_CD, POSITION_CD, REG_ID, REG_DT, CHG_ID, CHG_DT) 
+    			VALUES(:firstName, :lastName, :agentNo, :email, :mobileNo, :departmentCd, :positionCd, :createBy, GETDATE(), :createBy, GETDATE());
+			
+				SELECT @empId = scope_identity()
+			
+				INSERT INTO tp_usr_master(LOGIN_ID, PASSWORD, EMP_ID,  USE_YN, USER_PIC, REG_ID, REG_DT , CHG_ID, CHG_DT) 
+    			VALUES(:loginId, :password, @empId, :useYn, :userPic, :createBy, GETDATE(), :createBy, GETDATE())
+			
+				
+			END
+			COMMIT TRANSACTION 
+		]]>
+		</query>
+		<parameter name="firstName" required="false" nullable="true" />
+		<parameter name="lastName" required="false" nullable="true" />
+		<parameter name="agentNo" required="false" nullable="true" />
+		<parameter name="email" required="false" nullable="true" />
+		<parameter name="mobileNo" required="false" nullable="true" />
+		<parameter name="createBy" required="false" nullable="true" />
+		<parameter name="loginId" required="false" nullable="true" />
+		<parameter name="password" required="false" nullable="true" />		
+		<parameter name="useYn" required="false" nullable="true" />
+		<parameter name="userPic" required="false" nullable="true" />
+		<parameter name="departmentCd" required="false" nullable="false" />
+		<parameter name="positionCd" required="false" nullable="false" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_USR_ROLE_INSERT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+    		INSERT INTO TP_USR_ROLE (USER_ID, ROLE_ID, REG_ID, REG_DT) VALUES(:userId, :roleId, :createBy, GETDATE())
+		]]>
+		</query>
+		<parameter name="userId" required="false" nullable="true" />
+		<parameter name="createBy" required="false" nullable="true" />
+		<parameter name="roleId" required="false" nullable="true" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_AGENT_UPDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[		
+			UPDATE TP_EMPLOYEE SET CHG_ID=:updateBy, CHG_DT=GETDATE(), FIRST_NAME=:firstName, LAST_NAME=:lastName, EMP_NO=:agentNo, 
+    			EMAIL=:email, MOBILE_NO=:mobileNo, DEPARTMENT_CD = :departmentCd, POSITION_CD = :positionCd
+    		WHERE EMP_ID=:agentId
+		]]>
+		</query>
+		<parameter name="agentId" required="false" nullable="true" />
+		<parameter name="firstName" required="false" nullable="true" />
+		<parameter name="lastName" required="false" nullable="true" />
+		<parameter name="agentNo" required="false" nullable="true" />
+		<parameter name="email" required="false" nullable="true" />
+		<parameter name="mobileNo" required="false" nullable="true" />
+		<parameter name="departmentCd" required="false" nullable="false" />
+		<parameter name="positionCd" required="false" nullable="false" />
+		<parameter name="createBy" required="false" nullable="true" />
+		<parameter name="updateBy" required="false" nullable="true" />
+		
+	</sql-service>
+	
+	<sql-service name="USER.SQL_USR_UPDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			UPDATE tp_usr_master SET CHG_ID=:updateBy, CHG_DT=GETDATE(), PASSWORD=:password, USE_YN=:useYn, USER_PIC=:userPic WHERE USER_ID=:userId
+		]]>
+		</query>
+		<parameter name="agentId" required="false" nullable="true" />
+		<parameter name="createBy" required="false" nullable="true" />
+		<parameter name="updateBy" required="false" nullable="true" />
+		<parameter name="userId" required="false" nullable="true" />
+		<parameter name="loginId" required="false" nullable="true" />
+		<parameter name="password" required="false" nullable="true" />		
+		<parameter name="useYn" required="false" nullable="true" />
+		<parameter name="userPic" required="false" nullable="true" />	
+		<parameter name="roleId" required="false" nullable="true" />	
+	</sql-service>
+	
+	<sql-service name="USER.SQL_USR_ROLE_UPDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			UPDATE TP_USR_ROLE SET CHG_ID=:updateBy, CHG_DT=GETDATE(), ROLE_ID = :roleId WHERE USER_ID=:userId
+		]]>
+		</query>
+		<parameter name="updateBy" required="false" nullable="true" />
+		<parameter name="userId" required="false" nullable="true" />
+		<parameter name="roleId" required="false" nullable="true" />	
+	</sql-service>
+	
+	
+	<sql-service name="USER.SQL_LOGIN_AUTHORITY_BY_USER_NAME" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				USER_ID ,
+                LOGIN_ID ,
+                PASSWORD ,
+                USR_TYPE_CD ,
+                PWD_RECENT1 ,
+                PWD_RECENT2 ,
+                PWD_ERR_CNT ,
+                PWD_CHG_DT ,
+                CONNECT_IP ,
+                LOGIN_YN ,
+                LOGIN_MODE ,
+                LOGIN_DT ,
+                LOGOUT_DT ,
+                WAS_IP ,
+                AGENT_ID ,
+                CTI_ID ,
+                CTI_PASSWORD ,
+                CTI_STATION ,
+                CUR_LANG ,
+                CUR_ERA ,
+                LDAP_ID ,
+                REPORT_TO_ID ,
+                MAC_ADDR ,
+                USE_YN ,
+                REG_ID ,
+                REG_DT ,
+                CHG_ID ,
+                CHG_DT
+		  FROM TP_USR_MASTER
+		  WHERE 1=1 AND
+		  
+		  LOGIN_ID = :USER_NAME
+		]]>
+		</query>
+		<parameter name="USER_NAME" required="true" />
+	</sql-service>
+	
+	<sql-service name="common.login.myPostionList_select" datasource="hkccDs" paging="false" type="simple">
+        <description>common.login.myPostionList_select</description>
+        <result-name>ds_my_position_list</result-name>
+        <query><![CDATA[
+            SELECT
+                A.position_id
+                ,A.position_name
+                ,A.org_cd
+                ,A.pri_position_flag
+                ,A.CTI_EMAIL_FLAG
+                ,A.CTI_CHAT_FLAG
+                ,A.CAN_EMAIL_FLAG
+            FROM
+                TP_POSITION A,
+                TP_USR_MASTER B,
+                TP_AGENT C
+            WHERE
+                B.AGENT_ID = C.AGENT_ID and 
+                C.AGENT_ID = A.AGENT_ID and 
+                 ${#loginId?.text}
+                
+                A.PAR_POSITION_ID != 0
+                --parent_position_id != 0
+                
+        ]]></query>
+        <parameter name="loginId">B.LOGIN_ID = UPPER(:loginId) and </parameter>
+    </sql-service>
+    <!-- <sql-service name="USER.SQL_SEARCH_ALLAGENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT U.AGENT_ID, E.LAST_NAME, E.FIRST_NAME, E.EMAIL
+			FROM TP_USR_MASTER U
+			INNER JOIN TP_AGENT E ON U.AGENT_ID = E.AGENT_ID
+			WHERE U.USE_YN='Y'
+			ORDER BY 2,3
+		]]>
+		</query>
+	</sql-service> -->
+	
+	<!-- <sql-service name="USER.SQL_SEARCH_ALLAGENT_BY_GROUP" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT U.AGENT_ID, E.LAST_NAME, E.FIRST_NAME, E.EMAIL
+			FROM TP_USR_MASTER U
+			INNER JOIN TP_AGENT E ON U.AGENT_ID = E.AGENT_ID
+			WHERE U.USE_YN='Y' AND E.DEPT_CD=:DEPT_CODE AND USE_YN='Y'
+			ORDER BY 2,3
+		]]>
+		</query>
+		<parameter name="DEPT_CODE" required="true" />
+	</sql-service> -->
+	
+	<!-- <sql-service name="USER.SQL_SEARCH_ALLAGENT_BY_POS" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT U.AGENT_ID, E.LAST_NAME, E.FIRST_NAME, E.EMAIL
+			FROM TP_USR_MASTER U
+			INNER JOIN TP_AGENT E ON U.AGENT_ID = E.AGENT_ID
+			WHERE U.USE_YN='Y' AND E.POSITION_CD=:POSITION_CD
+			ORDER BY 2,3
+		]]>
+		</query>
+		<parameter name="POSITION_CD" required="true" />
+	</sql-service> -->
+	
+	
+	<!-- <sql-service name="USER.SQL_SEARCH_PERMISSION_CODE_BY_ROLE_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+
+			select REPLACE(REPLACE(UPPER(b.ACTION +'_'+c.ACTION_NAME),' ','_'),'.HTM','') AS PERMISSION_CODE from 
+					TP_ROLE_MENU_ACTION a left join TP_MENU b on a.MENU_ID = b.MENU_ID
+					left join SYS_ACTION c on c.ACTION_CD = a.ACTION_CD
+
+				WHERE a.ROLE_ID = :roleId AND a.ACTION_VALUE != 'ENABLED'  AND a.ACTION_VALUE != 'NONE' 
+				AND c.ACTION_NAME != 'EXTRA 01' 
+				AND c.ACTION_NAME != 'EXTRA 02' 
+				AND c.ACTION_NAME != 'EXTRA 03'
+				AND b.LEAF_YN = 'Y'
+		]]>
+		</query>
+		<parameter name="roleId" required="true" />
+	</sql-service> -->
+	
+	<sql-service name="USER.SQL_SEARCH_USER_PRIVILEGE" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[
+            SELECT b.menu_id, 
+	            b.caption,
+	            sysAct.action_name, 
+	            a.ACTION_CD as ROLE_ACTION_CODE,
+	            c.CODE_NAME as ROLE_ACTION_VALUE
+            FROM TP_ROLE_MENU_ACTION a
+            LEFT OUTER JOIN TP_MENU b on a.MENU_ID = b.MENU_ID
+            LEFT OUTER JOIN SYS_ACTION sysAct on a.ACTION_CD = sysAct.ACTION_CD
+            LEFT OUTER JOIN TP_CODEBOOK_LANG c ON c.CODE_TYPE = 'ROLE_ACTION' AND c.CODE_ID = a.action_value AND c.LANG_CD = 'EN'
+            WHERE a.ROLE_ID = :roleId
+        ]]>
+        </query>
+        <parameter name="roleId" required="true" />
+    </sql-service>
+    
+    <sql-service name="USER.SQL_SEARCH_USER_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				M.USER_ID AS USER_ID ,
+                M.LOGIN_ID AS LOGIN_ID,
+                M.PASSWORD ,
+                M.USR_TYPE_CD ,
+                M.PWD_RECENT1 ,
+                M.PWD_RECENT2 ,
+                M.PWD_ERR_CNT ,
+                M.PWD_CHG_DT ,
+                M.CONNECT_IP ,
+                M.LOGIN_YN ,
+                M.LOGIN_MODE ,
+                M.LOGIN_DT ,
+                M.LOGOUT_DT ,
+                M.CUR_LANG ,
+                M.CUR_ERA ,
+                M.LDAP_ID ,
+                M.REPORT_TO_ID ,
+                M.MAC_ADDR ,
+                M.USE_YN ,
+                M.USER_PIC,
+                E.FIRST_NAME,
+                E.LAST_NAME,
+                R.ROLE_ID,
+               	R.ROLE_NAME
+		  	FROM TP_USR_MASTER M
+		  	INNER JOIN TP_EMPLOYEE E ON M.EMP_ID = E.EMP_ID
+     	 	INNER JOIN TP_USR_ROLE UR ON UR.[USER_ID] = M.[USER_ID]
+      		INNER JOIN TP_ROLE R ON R.ROLE_ID = UR.ROLE_ID
+		]]>
+		</query>
+	</sql-service>
+	
+	<sql-service name="USER.SQL_SEARCH_UNDER_USER_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT u.[USER_ID], e.FIRST_NAME , e.LAST_NAME 
+			FROM TP_USR_MASTER u
+			LEFT OUTER JOIN TP_EMPLOYEE e ON e.EMP_ID = u.EMP_ID
+			WHERE u.REPORT_TO_ID = :userId
+		]]>
+		</query>
+		<parameter name="userId" required="true" />
+	</sql-service>
+	
+	 <sql-service name="USER.SQL_SEARCH_UNDER_USER_FREE_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT u.[USER_ID], e.FIRST_NAME , e.LAST_NAME
+			FROM TP_USR_MASTER u
+			LEFT OUTER JOIN TP_USR_ROLE ur ON ur.[USER_ID] = u.[USER_ID]
+			LEFT OUTER JOIN TP_ROLE r1 ON r1.ROLE_ID = ur.ROLE_ID
+			LEFT OUTER JOIN TP_ROLE r2 ON r1.PARENT_ROLE_ID = r2.ROLE_ID
+			LEFT OUTER JOIN TP_EMPLOYEE e ON e.EMP_ID = u.EMP_ID
+			WHERE r2.ROLE_ID = :roleId
+			AND u.REPORT_TO_ID IS NULL
+		]]>
+		</query>
+		<parameter name="roleId" required="true" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_SAVE_USER_ASSIGNMENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_USR_MASTER SET
+			REPORT_TO_ID = :userId
+			WHERE [USER_ID] IN (:assignUserId)
+		]]>
+		</query>
+		<parameter name="userId" required="true" />
+		<parameter name="assignUserId" required="true" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_SAVE_USER_UNASSIGNMENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		UPDATE TP_USR_MASTER SET
+		REPORT_TO_ID = null
+		WHERE [USER_ID] IN (
+			SELECT [USER_ID] FROM TP_USR_MASTER
+			WHERE REPORT_TO_ID = :userId
+			${#assignUserId?.text}
+		)
+		]]>
+		</query>
+		<parameter name="userId" required="true" />
+		<parameter name='assignUserId'> AND [USER_ID] NOT IN (:assignUserId)</parameter>
+	</sql-service>
+	
+	<sql-service name="USER.SQL_FIND_USER_IN_TEAM" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+		  WITH cte AS
+		  (  
+			  SELECT T.*
+				FROM tp_usr_master AS T
+				WHERE T.USER_ID = :userId
+		    
+				UNION ALL
+		    
+				SELECT T.*
+				FROM tp_usr_master as T
+				INNER JOIN cte as C
+				ON T.REPORT_TO_ID = C.USER_ID
+			)
+			SELECT USER_ID
+			FROM cte
+			OPTION (maxrecursion 0);
+		]]>
+		</query>
+		<parameter name="userId" required="true" />
+	</sql-service>
+	
+	<sql-service name="USER.SQL_USR_PASSWORD_UPDATE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			UPDATE tp_usr_master SET CHG_ID=:userId, CHG_DT=GETDATE(), PASSWORD=:bytePassword WHERE USER_ID=:userId
+		]]>
+		</query>
+		<parameter name="userId" required="false" nullable="true" />
+		<parameter name="bytePassword" required="false" nullable="true" />
+	</sql-service>
+</query-collection>

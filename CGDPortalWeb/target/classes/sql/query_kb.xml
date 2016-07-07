@@ -1,0 +1,1143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	
+	<sql-service name="KB.SQL_FIND_CATE1_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat1.CONTENT_CAT_ID, cat1.CONTENT_TYPE_CD, cat1.CAT_NAME, cat1.STATUS_CD, cat1.DESCP, cat1.SLA_ID, cat1.REG_ID, cat1.REG_DT, cat1.CHG_ID, cat1.CHG_DT , 
+			CASE WHEN count(cat2.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 1 AS LEVEL,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_1_ID = cat1.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM1 = cat1.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_CAT1 cat1
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT2 cat2 ON cat1.CONTENT_CAT_ID = cat2.PARENT_CAT_ID
+			WHERE cat1.CONTENT_TYPE_CD = :contentTypeCd
+			AND cat1.STATUS_CD = :statusCd
+			${#ownerGroup?.text}
+			GROUP BY cat1.CONTENT_CAT_ID, cat1.CONTENT_TYPE_CD, cat1.CAT_NAME, cat1.STATUS_CD, cat1.DESCP, cat1.SLA_ID, cat1.REG_ID, cat1.REG_DT, cat1.CHG_ID, cat1.CHG_DT
+			ORDER BY cat1.CAT_NAME
+		]]>
+		</query>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="ownerGroup">AND cat1.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE2_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat2.CONTENT_CAT_ID, cat2.CONTENT_TYPE_CD, cat2.CAT_NAME, cat2.STATUS_CD, cat2.PARENT_CAT_ID, cat2.DESCP, cat2.SLA_ID, cat2.REG_ID, cat2.REG_DT, cat2.CHG_ID, cat2.CHG_DT, 
+			CASE WHEN count(cat3.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 2 AS LEVEL,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_2_ID = cat2.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM2 = cat2.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_CAT2 cat2
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT3 cat3 ON cat2.CONTENT_CAT_ID = cat3.PARENT_CAT_ID
+			WHERE cat2.PARENT_CAT_ID = :contentCatId
+			AND cat2.CONTENT_TYPE_CD = :contentTypeCd
+			AND cat2.STATUS_CD = :statusCd
+			${#ownerGroup?.text}
+			GROUP BY cat2.CONTENT_CAT_ID, cat2.CONTENT_TYPE_CD, cat2.CAT_NAME, cat2.STATUS_CD, cat2.PARENT_CAT_ID, cat2.DESCP, cat2.SLA_ID, cat2.REG_ID, cat2.REG_DT, cat2.CHG_ID, cat2.CHG_DT
+			ORDER BY cat2.CAT_NAME
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="ownerGroup">AND cat2.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE3_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat3.CONTENT_CAT_ID, cat3.CONTENT_TYPE_CD, cat3.CAT_NAME, cat3.STATUS_CD, cat3.PARENT_CAT_ID, cat3.DESCP, cat3.SLA_ID, cat3.REG_ID, cat3.REG_DT, cat3.CHG_ID, cat3.CHG_DT, 
+			CASE WHEN count(cat4.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 3 AS LEVEL,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_3_ID = cat3.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM3 = cat3.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_cat3 cat3
+			LEFT OUTER JOIN TP_KB_CONTENT_cat4 cat4 ON cat3.CONTENT_CAT_ID = cat4.PARENT_CAT_ID
+			WHERE cat3.PARENT_CAT_ID = :contentCatId
+			AND cat3.CONTENT_TYPE_CD = :contentTypeCd
+			AND cat3.STATUS_CD = :statusCd
+			${#ownerGroup?.text}
+			GROUP BY cat3.CONTENT_CAT_ID, cat3.CONTENT_TYPE_CD, cat3.CAT_NAME, cat3.STATUS_CD, cat3.PARENT_CAT_ID, cat3.DESCP, cat3.SLA_ID, cat3.REG_ID, cat3.REG_DT, cat3.CHG_ID, cat3.CHG_DT
+			ORDER BY cat3.CAT_NAME
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="ownerGroup">AND cat3.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE4_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat4.CONTENT_CAT_ID, cat4.CONTENT_TYPE_CD, cat4.CAT_NAME, cat4.STATUS_CD, cat4.PARENT_CAT_ID, cat4.DESCP, cat4.SLA_ID, cat4.REG_ID, cat4.REG_DT, cat4.CHG_ID, cat4.CHG_DT, 
+			CASE WHEN count(cat5.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 4 AS LEVEL,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_4_ID = cat4.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM4 = cat4.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_cat4 cat4
+			LEFT OUTER JOIN TP_KB_CONTENT_cat5 cat5 ON cat4.CONTENT_CAT_ID = cat5.PARENT_CAT_ID
+			WHERE cat4.PARENT_CAT_ID = :contentCatId
+			AND cat4.CONTENT_TYPE_CD = :contentTypeCd
+			AND cat4.STATUS_CD = :statusCd
+			${#ownerGroup?.text}
+			GROUP BY cat4.CONTENT_CAT_ID, cat4.CONTENT_TYPE_CD, cat4.CAT_NAME, cat4.STATUS_CD, cat4.PARENT_CAT_ID, cat4.DESCP, cat4.SLA_ID, cat4.REG_ID, cat4.REG_DT, cat4.CHG_ID, cat4.CHG_DT
+			ORDER BY cat4.CAT_NAME
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="ownerGroup">AND cat4.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE5_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT *,0 AS HAS_CHILD, 5 AS LEVEL ,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_5_ID = cat5.CONTENT_CAT_ID) AS HAS_DATA,
+      (SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM5 = cat5.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_CAT5 cat5
+			WHERE cat5.PARENT_CAT_ID = :contentCatId
+			AND cat5.CONTENT_TYPE_CD = :contentTypeCd
+			AND cat5.STATUS_CD = :statusCd
+			${#ownerGroup?.text}
+			ORDER BY cat5.CAT_NAME
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="ownerGroup">AND cat5.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE1" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat1.CONTENT_CAT_ID, cat1.CONTENT_TYPE_CD, cat1.CAT_NAME, cat1.STATUS_CD, cat1.DESCP, 
+			 cat1.SLA_ID, cat1.REG_ID, cat1.REG_DT, cat1.CHG_ID, cat1.CHG_DT , CASE WHEN count(cat2.CONTENT_CAT_ID) > 0 THEN 1 ELSE 0 END AS HAS_CHILD
+			 , sla.SLA_UNIT , reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy , chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy
+			FROM TP_KB_CONTENT_CAT1 cat1
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat1.SLA_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT2 cat2 ON cat1.CONTENT_CAT_ID = cat2.PARENT_CAT_ID
+			LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat1.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat1.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat1.CONTENT_CAT_ID = :contentCatId
+			GROUP BY cat1.CONTENT_CAT_ID, cat1.CONTENT_TYPE_CD, cat1.CAT_NAME, cat1.STATUS_CD, cat1.DESCP, 
+			cat1.SLA_ID, cat1.REG_ID, cat1.REG_DT, cat1.CHG_ID, cat1.CHG_DT, sla.SLA_UNIT, 
+			reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="level" required="true"/>
+	</sql-service>
+		
+	<sql-service name="KB.SQL_FIND_CATE2" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat2.CONTENT_CAT_ID, cat2.CONTENT_TYPE_CD, cat2.CAT_NAME, cat2.STATUS_CD, cat2.DESCP, 
+				cat2.SLA_ID, cat2.REG_ID, cat2.REG_DT, cat2.CHG_ID, cat2.CHG_DT , CASE WHEN count(cat3.CONTENT_CAT_ID) > 0 THEN 1 ELSE 0 END AS HAS_CHILD
+				, sla.SLA_UNIT, cat1.CAT_NAME AS PARENT_CAT_NAME, cat2.PARENT_CAT_ID
+				, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+ 				, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy
+     		FROM TP_KB_CONTENT_CAT2 cat2
+      		LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat2.SLA_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT1 cat1 ON cat1.CONTENT_CAT_ID = cat2.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_CAT3 cat3 ON cat2.CONTENT_CAT_ID = cat3.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat2.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat2.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat2.CONTENT_CAT_ID = :contentCatId
+			GROUP BY cat2.CONTENT_CAT_ID, cat2.CONTENT_TYPE_CD, cat2.CAT_NAME, cat2.STATUS_CD, cat2.DESCP, 
+				cat2.SLA_ID, cat2.REG_ID, cat2.REG_DT, cat2.CHG_ID, cat2.CHG_DT, sla.SLA_UNIT, cat1.CAT_NAME,
+				reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME, cat2.PARENT_CAT_ID
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="level" required="true"/>
+	</sql-service>
+		
+	<sql-service name="KB.SQL_FIND_CATE3" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat3.CONTENT_CAT_ID, cat3.CONTENT_TYPE_CD, cat3.CAT_NAME, cat3.STATUS_CD, cat3.DESCP, 
+				cat3.SLA_ID, cat3.REG_ID, cat3.REG_DT, cat3.CHG_ID, cat3.CHG_DT , CASE WHEN count(cat4.CONTENT_CAT_ID) > 0 THEN 1 ELSE 0 END AS HAS_CHILD
+				, sla.SLA_UNIT, cat2.CAT_NAME AS PARENT_CAT_NAME, cat3.PARENT_CAT_ID
+				, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+ 				, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy
+      		FROM TP_KB_CONTENT_CAT3 cat3
+      		LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat3.SLA_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT2 cat2 ON cat2.CONTENT_CAT_ID = cat3.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_CAT4 cat4 ON cat3.CONTENT_CAT_ID = cat4.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat3.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat3.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat3.CONTENT_CAT_ID = :contentCatId
+			GROUP BY cat3.CONTENT_CAT_ID, cat3.CONTENT_TYPE_CD, cat3.CAT_NAME, cat3.STATUS_CD, cat3.DESCP, 
+				cat3.SLA_ID, cat3.REG_ID, cat3.REG_DT, cat3.CHG_ID, cat3.CHG_DT, sla.SLA_UNIT, cat2.CAT_NAME,
+				reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME, cat3.PARENT_CAT_ID
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="level" required="true"/>
+	</sql-service>
+		
+	<sql-service name="KB.SQL_FIND_CATE4" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			
+      		SELECT cat4.CONTENT_CAT_ID, cat4.CONTENT_TYPE_CD, cat4.CAT_NAME, cat4.STATUS_CD, cat4.DESCP, 
+				cat4.SLA_ID, cat4.REG_ID, cat4.REG_DT, cat4.CHG_ID, cat4.CHG_DT , CASE WHEN count(cat5.CONTENT_CAT_ID) > 0 THEN 1 ELSE 0 END AS HAS_CHILD
+				, sla.SLA_UNIT, cat3.CAT_NAME AS PARENT_CAT_NAME, cat4.PARENT_CAT_ID
+				, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+ 				, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy
+      		FROM TP_KB_CONTENT_CAT4 cat4
+      		LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat4.SLA_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT3 cat3 ON cat3.CONTENT_CAT_ID = cat4.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_CAT5 cat5 ON cat4.CONTENT_CAT_ID = cat5.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat4.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat4.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat4.CONTENT_CAT_ID = :contentCatId
+			GROUP BY cat4.CONTENT_CAT_ID, cat4.CONTENT_TYPE_CD, cat4.CAT_NAME, cat4.STATUS_CD, cat4.DESCP, 
+				cat4.SLA_ID, cat4.REG_ID, cat4.REG_DT, cat4.CHG_ID, cat4.CHG_DT, sla.SLA_UNIT, cat3.CAT_NAME,
+				reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME, cat4.PARENT_CAT_ID
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="level" required="true"/>
+	</sql-service>
+		
+	<sql-service name="KB.SQL_FIND_CATE5" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat5.CONTENT_CAT_ID, cat5.CONTENT_TYPE_CD, cat5.CAT_NAME, cat5.STATUS_CD, cat5.DESCP, 
+				cat5.SLA_ID, cat5.REG_ID, cat5.REG_DT, cat5.CHG_ID, cat5.CHG_DT
+				, sla.SLA_UNIT, cat4.CAT_NAME AS PARENT_CAT_NAME, cat5.PARENT_CAT_ID
+				, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+ 				, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy
+      		FROM TP_KB_CONTENT_CAT5 cat5
+      		LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat5.SLA_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT4 cat4 ON cat4.CONTENT_CAT_ID = cat5.PARENT_CAT_ID
+			LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat5.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat5.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat5.CONTENT_CAT_ID = :contentCatId
+			GROUP BY cat5.CONTENT_CAT_ID, cat5.CONTENT_TYPE_CD, cat5.CAT_NAME, cat5.STATUS_CD, cat5.DESCP, 
+				cat5.SLA_ID, cat5.REG_ID, cat5.REG_DT, cat5.CHG_ID, cat5.CHG_DT, sla.SLA_UNIT, cat4.CAT_NAME,
+				reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME, cat5.PARENT_CAT_ID
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="level" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_INSERT_CATEGORY1" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_KB_CONTENT_CAT1(
+			  CONTENT_CAT_ID, 
+			  CONTENT_TYPE_CD, 
+			  CAT_NAME, 
+			  STATUS_CD, 
+			  DESCP, 
+			  SLA_ID, 
+			  REG_ID, 
+			  REG_DT, 
+			  CHG_ID, 
+			  CHG_DT) 
+			VALUES (
+			  :contentCatId, 
+			  :contentTypeCd, 
+			  :catName, 
+			  :statusCd, 
+			  :descp, 
+			  :slaId, 
+			  :regId, 
+			  GETDATE(), 
+			  :regId, 
+			  GETDATE()
+			)
+						
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="regId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_INSERT_CATEGORY2" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_KB_CONTENT_CAT2(
+			  CONTENT_CAT_ID, 
+			  CONTENT_TYPE_CD, 
+			  CAT_NAME, 
+			  STATUS_CD,
+			  PARENT_CAT_ID,
+			  DESCP, 
+			  SLA_ID, 
+			  REG_ID, 
+			  REG_DT, 
+			  CHG_ID, 
+			  CHG_DT) 
+			VALUES (
+			  :contentCatId, 
+			  :contentTypeCd, 
+			  :catName, 
+			  :statusCd, 
+			  :parentCatId, 
+			  :descp, 
+			  :slaId, 
+			  :regId, 
+			  GETDATE(), 
+			  :regId, 
+			  GETDATE()
+			)
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="regId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_INSERT_CATEGORY3" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_KB_CONTENT_CAT3(
+			  CONTENT_CAT_ID, 
+			  CONTENT_TYPE_CD, 
+			  CAT_NAME, 
+			  STATUS_CD,
+			  PARENT_CAT_ID,
+			  DESCP, 
+			  SLA_ID, 
+			  REG_ID, 
+			  REG_DT, 
+			  CHG_ID, 
+			  CHG_DT) 
+			VALUES (
+			  :contentCatId, 
+			  :contentTypeCd, 
+			  :catName, 
+			  :statusCd, 
+			  :parentCatId, 
+			  :descp, 
+			  :slaId, 
+			  :regId, 
+			  GETDATE(), 
+			  :regId, 
+			  GETDATE()
+			)
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="regId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_INSERT_CATEGORY4" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_KB_CONTENT_CAT4(
+			  CONTENT_CAT_ID, 
+			  CONTENT_TYPE_CD, 
+			  CAT_NAME, 
+			  STATUS_CD,
+			  PARENT_CAT_ID,
+			  DESCP, 
+			  SLA_ID, 
+			  REG_ID, 
+			  REG_DT, 
+			  CHG_ID, 
+			  CHG_DT) 
+			VALUES (
+			  :contentCatId, 
+			  :contentTypeCd, 
+			  :catName, 
+			  :statusCd, 
+			  :parentCatId, 
+			  :descp, 
+			  :slaId, 
+			  :regId, 
+			  GETDATE(), 
+			  :regId, 
+			  GETDATE()
+			)
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="regId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_INSERT_CATEGORY5" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_KB_CONTENT_CAT5(
+			  CONTENT_CAT_ID, 
+			  CONTENT_TYPE_CD, 
+			  CAT_NAME, 
+			  STATUS_CD,
+			  PARENT_CAT_ID,
+			  DESCP, 
+			  SLA_ID, 
+			  REG_ID, 
+			  REG_DT, 
+			  CHG_ID, 
+			  CHG_DT) 
+			VALUES (
+			  :contentCatId, 
+			  :contentTypeCd, 
+			  :catName, 
+			  :statusCd, 
+			  :parentCatId, 
+			  :descp, 
+			  :slaId, 
+			  :regId, 
+			  GETDATE(), 
+			  :regId, 
+			  GETDATE()
+			)
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="regId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_CATEGORY1" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_CAT1 
+			SET CONTENT_TYPE_CD = :contentTypeCd, 
+			CAT_NAME = :catName, 
+			STATUS_CD = :statusCd, 
+			DESCP = :descp, 
+			SLA_ID = :slaId, 
+			CHG_ID = :chgId, 
+			CHG_DT = GETDATE()
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="chgId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_CATEGORY2" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_CAT2 
+			SET CONTENT_TYPE_CD = :contentTypeCd, 
+			CAT_NAME = :catName, 
+			STATUS_CD = :statusCd, 
+			PARENT_CAT_ID = :parentCatId,
+			DESCP = :descp, 
+			SLA_ID = :slaId, 
+			CHG_ID = :chgId, 
+			CHG_DT = GETDATE()
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="chgId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_CATEGORY3" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_CAT3 
+			SET CONTENT_TYPE_CD = :contentTypeCd, 
+			CAT_NAME = :catName, 
+			STATUS_CD = :statusCd, 
+			PARENT_CAT_ID = :parentCatId,
+			DESCP = :descp, 
+			SLA_ID = :slaId, 
+			CHG_ID = :chgId, 
+			CHG_DT = GETDATE()
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="chgId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_CATEGORY4" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_CAT4 
+			SET CONTENT_TYPE_CD = :contentTypeCd, 
+			CAT_NAME = :catName, 
+			STATUS_CD = :statusCd, 
+			PARENT_CAT_ID = :parentCatId,
+			DESCP = :descp, 
+			SLA_ID = :slaId, 
+			CHG_ID = :chgId, 
+			CHG_DT = GETDATE()
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="chgId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_CATEGORY5" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			UPDATE TP_KB_CONTENT_CAT5
+			SET CONTENT_TYPE_CD = :contentTypeCd, 
+			CAT_NAME = :catName, 
+			STATUS_CD = :statusCd, 
+			PARENT_CAT_ID = :parentCatId,
+			DESCP = :descp, 
+			SLA_ID = :slaId, 
+			CHG_ID = :chgId, 
+			CHG_DT = GETDATE()
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+		<parameter name="contentTypeCd" required="true"/>
+		<parameter name="catName" required="true"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="parentCatId" required="true"/>
+		<parameter name="descp" required="true"/>
+		<parameter name="slaId" required="true"/>
+		<parameter name="chgId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_DELETE_CATEGORY1" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			DELETE FROM TP_KB_CONTENT_CAT1
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_DELETE_CATEGORY2" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			DELETE FROM TP_KB_CONTENT_CAT2
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_DELETE_CATEGORY3" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			DELETE FROM TP_KB_CONTENT_CAT3
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_DELETE_CATEGORY4" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			DELETE FROM TP_KB_CONTENT_CAT4
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_DELETE_CATEGORY5" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[
+			DELETE FROM TP_KB_CONTENT_CAT5
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE1_LIST_BY_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat1.CONTENT_CAT_ID, cat1.CONTENT_TYPE_CD, cat1.CAT_NAME, cat1.STATUS_CD, 
+      		cat1.DESCP, cat1.SLA_ID, cat1.REG_ID, cat1.REG_DT, cat1.CHG_ID, cat1.CHG_DT , CASE WHEN count(cat2.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD
+			, 1 AS LEVEL, sla.SLA_UNIT, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+			, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy,
+      		(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_1_ID = cat1.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM1 = cat1.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_CAT1 cat1
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT2 cat2 ON cat1.CONTENT_CAT_ID = cat2.PARENT_CAT_ID
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat1.SLA_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat1.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat1.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat1.CAT_NAME like :keyword
+			${#ownerGroup?.text}
+			GROUP BY cat1.CONTENT_CAT_ID, cat1.CONTENT_TYPE_CD, cat1.CAT_NAME, cat1.STATUS_CD, cat1.DESCP, 
+      		cat1.SLA_ID, cat1.REG_ID, cat1.REG_DT, cat1.CHG_ID, cat1.CHG_DT, sla.SLA_UNIT,reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME
+			ORDER BY cat1.CAT_NAME
+
+		]]>
+		</query>
+		<parameter name="keyword" prefix="%" suffix="%" required="true"/>
+		<parameter name="ownerGroup">AND cat1.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE2_LIST_BY_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT cat2.CONTENT_CAT_ID, cat2.CONTENT_TYPE_CD, cat2.CAT_NAME, cat2.STATUS_CD, 
+      		cat2.PARENT_CAT_ID, cat2.DESCP, cat2.SLA_ID, cat2.REG_ID, cat2.REG_DT, cat2.CHG_ID, 
+      		cat2.CHG_DT, CASE WHEN count(cat3.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 2 AS LEVEL, 
+     		 sla.SLA_UNIT, cat1.CAT_NAME AS PARENT_CAT_NAME, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+			, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy,
+      		(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_2_ID = cat2.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM2 = cat2.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_CAT2 cat2
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT3 cat3 ON cat2.CONTENT_CAT_ID = cat3.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_CAT1 cat1 ON cat2.PARENT_CAT_ID = cat1.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat2.SLA_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat2.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat2.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat2.CAT_NAME like :keyword
+			${#ownerGroup?.text}
+			GROUP BY cat2.CONTENT_CAT_ID, cat2.CONTENT_TYPE_CD, cat2.CAT_NAME, cat2.STATUS_CD, 
+     		cat2.PARENT_CAT_ID, cat2.DESCP, cat2.SLA_ID, cat2.REG_ID, cat2.REG_DT, cat2.CHG_ID, cat2.CHG_DT, sla.SLA_UNIT, cat1.CAT_NAME, reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME
+			ORDER BY cat2.CAT_NAME
+			
+		]]>
+		</query>
+		<parameter name="keyword" prefix="%" suffix="%" required="true"/>
+		<parameter name="ownerGroup">AND cat2.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE3_LIST_BY_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat3.CONTENT_CAT_ID, cat3.CONTENT_TYPE_CD, cat3.CAT_NAME, cat3.STATUS_CD, cat3.PARENT_CAT_ID, cat3.DESCP, cat3.SLA_ID, cat3.REG_ID, cat3.REG_DT, cat3.CHG_ID, cat3.CHG_DT, 
+			CASE WHEN count(cat4.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 3 AS LEVEL, sla.SLA_UNIT, cat2.CAT_NAME AS PARENT_CAT_NAME, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+			, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_3_ID = cat3.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM3 = cat3.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_cat3 cat3
+			LEFT OUTER JOIN TP_KB_CONTENT_cat4 cat4 ON cat3.CONTENT_CAT_ID = cat4.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_cat2 cat2 ON cat3.PARENT_CAT_ID = cat2.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat3.SLA_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat3.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat3.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat3.CAT_NAME like :keyword
+			${#ownerGroup?.text}
+			GROUP BY cat3.CONTENT_CAT_ID, cat3.CONTENT_TYPE_CD, cat3.CAT_NAME, cat3.STATUS_CD, cat3.PARENT_CAT_ID, cat3.DESCP, cat3.SLA_ID, cat3.REG_ID, cat3.REG_DT, cat3.CHG_ID, cat3.CHG_DT, sla.SLA_UNIT, cat2.CAT_NAME, reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME
+			ORDER BY cat3.CAT_NAME
+		]]>
+		</query>
+		<parameter name="keyword" prefix="%" suffix="%" required="true"/>
+		<parameter name="ownerGroup">AND cat3.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE4_LIST_BY_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat4.CONTENT_CAT_ID, cat4.CONTENT_TYPE_CD, cat4.CAT_NAME, cat4.STATUS_CD, cat4.PARENT_CAT_ID, cat4.DESCP, cat4.SLA_ID, cat4.REG_ID, cat4.REG_DT, cat4.CHG_ID, cat4.CHG_DT, 
+			CASE WHEN count(cat5.CONTENT_CAT_ID) > 0 THEN '1' ELSE '0' END AS HAS_CHILD, 4 AS LEVEL, sla.SLA_UNIT, cat3.CAT_NAME AS PARENT_CAT_NAME, reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+			, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_4_ID = cat4.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM4 = cat4.CONTENT_CAT_ID) AS USED_BY_SR
+			FROM TP_KB_CONTENT_cat4 cat4
+			LEFT OUTER JOIN TP_KB_CONTENT_cat5 cat5 ON cat4.CONTENT_CAT_ID = cat5.PARENT_CAT_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_cat3 cat3 ON cat4.PARENT_CAT_ID = cat3.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat4.SLA_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat4.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat4.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat4.CAT_NAME like :keyword
+			${#ownerGroup?.text}
+			GROUP BY cat4.CONTENT_CAT_ID, cat4.CONTENT_TYPE_CD, cat4.CAT_NAME, cat4.STATUS_CD, cat4.PARENT_CAT_ID, cat4.DESCP, cat4.SLA_ID, cat4.REG_ID, cat4.REG_DT, cat4.CHG_ID, cat4.CHG_DT, sla.SLA_UNIT, cat3.CAT_NAME, reg_em.FIRST_NAME, reg_em.LAST_NAME, chg_em.FIRST_NAME, chg_em.LAST_NAME
+			ORDER BY cat4.CAT_NAME
+		]]>
+		</query>
+		<parameter name="keyword" prefix="%" suffix="%" required="true"/>
+		<parameter name="ownerGroup">AND cat4.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CATE5_LIST_BY_KEYWORD" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT cat5.CONTENT_CAT_ID, cat5.CONTENT_TYPE_CD, cat5.CAT_NAME, cat5.STATUS_CD, cat5.PARENT_CAT_ID, cat5.DESCP, cat5.SLA_ID, cat5.REG_ID, cat5.REG_DT, cat5.CHG_ID, cat5.CHG_DT,
+			0 AS HAS_CHILD, 5 AS LEVEL, sla.SLA_UNIT, cat4.CAT_NAME AS PARENT_CAT_NAME , reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS createBy
+			, chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS updateBy,
+			(SELECT CASE WHEN count(content.CONTENT_ID) > 0 THEN '1' ELSE '0' END FROM TP_KB_CONTENT content WHERE content.CONTENT_CAT_5_ID = cat5.CONTENT_CAT_ID) AS HAS_DATA,
+      		(SELECT CASE WHEN count(sr.SR_NUMBER) > 0 THEN '1' ELSE '0' END FROM TP_SR sr WHERE sr.SR_TYPE_PROBLEM5 = cat5.CONTENT_CAT_ID) AS USED_BY_SR
+      		FROM TP_KB_CONTENT_CAT5 cat5
+			LEFT OUTER JOIN TP_SLA sla ON sla.SLA_ID = cat5.SLA_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_CAT4 cat4 ON cat5.PARENT_CAT_ID = cat4.CONTENT_CAT_ID
+      		LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = cat5.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = cat5.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+			WHERE cat5.CAT_NAME like :keyword
+			${#ownerGroup?.text}
+			ORDER BY cat5.CAT_NAME
+		]]>
+		</query>
+		<parameter name="keyword" prefix="%" suffix="%" required="true"/>
+		<parameter name="ownerGroup">AND cat5.REG_ID IN (:ownerGroup) </parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CONTENT_BY_CRITERIA" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT content.* , status.CODE_NAME AS STATUS_NAME
+			      , reg_em.FIRST_NAME + ' ' + reg_em.LAST_NAME AS CREATE_BY
+			      , chg_em.FIRST_NAME + ' ' + chg_em.LAST_NAME AS UPDATE_BY
+			FROM TP_KB_CONTENT content
+			LEFT OUTER JOIN TP_USR_MASTER reg ON reg.[USER_ID] = content.REG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE reg_em ON reg.EMP_ID = reg_em.EMP_ID
+			LEFT OUTER JOIN TP_USR_MASTER chg ON chg.[USER_ID] = content.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE chg_em ON chg.EMP_ID = chg_em.EMP_ID
+      		LEFT OUTER JOIN TP_CODEBOOK_LANG status ON status.CODE_TYPE = 'KB_CONTENT_STATUS' AND status.CODE_ID = content.STATUS_CD and status.LANG_CD = :langCd
+			WHERE 1=1
+			${#ownerGroup?.text}
+			${#contentNumber?.text}
+			${#contentCat1Id?.text}
+			${#contentCat2Id?.text}
+			${#contentCat3Id?.text}
+			${#contentCat4Id?.text}
+			${#contentCat5Id?.text}
+			${#keyword?.text}
+			ORDER BY content.CONTENT_NUMBER DESC
+		]]>
+		</query>
+		<parameter name="contentNumber" prefix="%" suffix="%"> AND CONTENT_NUMBER LIKE :contentNumber</parameter>
+		<parameter name="contentCat1Id"> AND CONTENT_CAT_1_ID = :contentCat1Id</parameter>
+		<parameter name="contentCat2Id"> AND CONTENT_CAT_2_ID = :contentCat2Id</parameter>
+		<parameter name="contentCat3Id"> AND CONTENT_CAT_3_ID = :contentCat3Id</parameter>
+		<parameter name="contentCat4Id"> AND CONTENT_CAT_4_ID = :contentCat4Id</parameter>
+		<parameter name="contentCat5Id"> AND CONTENT_CAT_5_ID = :contentCat5Id</parameter>
+		<parameter name="keyword" prefix="%" suffix="%"> AND (content.TITLE LIKE :keyword OR content.QUESTION LIKE :keyword OR content.SUMMARY LIKE :keyword)</parameter>
+		<parameter name="ownerGroup">AND content.REG_ID IN (:ownerGroup) </parameter>
+		<parameter name="langCd" required="true"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CONTENT_ATT_BY_CONTENT_ID" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT
+				 C.CONTENT_ATT_ID AS contentAttId
+				,C.CONTENT_ID AS contentId
+				,R.TITLE AS contentTitle
+				,C.TITLE AS title
+				,A.FILE_PATH AS filePath
+				,A.FILE_NAME AS fileName
+				,MAIN_FLAG AS mainFlag
+				,C.ATT_ID AS attId
+				,C.DESCP AS descp
+				,A.FILE_TYPE AS fileType
+				,C.REG_ID AS regId
+				,CONVERT(VARCHAR(10), C.REG_DT, 103)+' '+SUBSTRING(CONVERT(VARCHAR(12), C.REG_DT, 114),0,9) AS regDtText
+				,U.FIRST_NAME+' '+U.LAST_NAME AS regBy				
+				,CONVERT(VARCHAR(10), C.CHG_DT, 103)+' '+SUBSTRING(CONVERT(VARCHAR(12), C.CHG_DT, 114),0,9) AS chgDtText
+				,H.FIRST_NAME+' '+H.LAST_NAME AS chgBy
+				
+			FROM  TP_KB_CONTENT_ATT C
+			INNER JOIN TP_KB_CONTENT R ON C.CONTENT_ID = R.CONTENT_ID
+			INNER JOIN TP_ATT A ON C.ATT_ID = A.ATT_ID
+			LEFT JOIN TP_EMPLOYEE U ON C.REG_ID = U.EMP_ID
+			LEFT JOIN TP_EMPLOYEE H ON C.CHG_ID = H.EMP_ID
+			
+			WHERE 1=1  
+			${#CONTENT_ID?.text}  
+			ORDER BY C.TITLE ASC
+			
+		]]>
+		</query>
+		<parameter name="CONTENT_ID"> AND C.CONTENT_ID = :CONTENT_ID</parameter>
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_INSERT_CONTENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			INSERT INTO TP_KB_CONTENT(
+			  CONTENT_NUMBER, 
+			  CONTENT_CAT_1_ID, 
+			  CONTENT_CAT_2_ID, 
+			  CONTENT_CAT_3_ID, 
+			  CONTENT_CAT_4_ID, 
+			  CONTENT_CAT_5_ID, 
+			  TITLE, 
+			  TYPE,
+			  QUESTION, 
+			  SUMMARY, 
+			  STATUS_CD, 
+			  REG_ID, 
+			  REG_DT, 
+			  CHG_ID, 
+			  CHG_DT,
+			  EXTERNAL_REF_ID) 
+			VALUES (
+			  :contentNumber, 
+			  :contentCat1Id, 
+			  :contentCat2Id, 
+			  :contentCat3Id, 
+			  :contentCat4Id, 
+			  :contentCat5Id, 
+			  :title, 
+			  :type,
+			  :question, 
+			  :summary, 
+			  :statusCd, 
+			  :regId, 
+			  GETDATE(), 
+			  :regId, 
+			  GETDATE(),
+			  :externalRefId)
+
+		]]>
+		</query>
+		<parameter name="contentNumber" required="true"/>
+		<parameter name="contentCat1Id" required="true"/>
+		<parameter name="contentCat2Id" required="false"/>
+		<parameter name="contentCat3Id" required="false"/>
+		<parameter name="contentCat4Id" required="false"/>
+		<parameter name="contentCat5Id" required="false"/>
+		<parameter name="title" required="true"/>
+		<parameter name="type" required="true"/>
+		<parameter name="question" required="true"/>
+		<parameter name="summary" required="false"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="regId" required="true"/>
+		<parameter name="externalRefId" required="false"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_CONTENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			UPDATE TP_KB_CONTENT SET 
+				CONTENT_NUMBER = :contentNumber , 
+				CONTENT_CAT_1_ID = :contentCat1Id, 
+				CONTENT_CAT_2_ID = :contentCat2Id, 
+				CONTENT_CAT_3_ID = :contentCat3Id, 
+				CONTENT_CAT_4_ID = :contentCat4Id, 
+				CONTENT_CAT_5_ID = :contentCat5Id, 
+				TITLE = :title, 
+				TYPE = :type,
+				QUESTION = :question, 
+				SUMMARY = :summary, 
+				STATUS_CD = :statusCd,  
+				CHG_ID = :chgId, 
+				CHG_DT = GETDATE(),
+				EXTERNAL_REF_ID = :externalRefId
+			WHERE CONTENT_ID = :contentId
+			
+		]]>
+		</query>
+		<parameter name="contentId" required="true"/>
+		<parameter name="contentNumber" required="true"/>
+		<parameter name="contentCat1Id" required="true"/>
+		<parameter name="contentCat2Id" required="false"/>
+		<parameter name="contentCat3Id" required="false"/>
+		<parameter name="contentCat4Id" required="false"/>
+		<parameter name="contentCat5Id" required="false"/>
+		<parameter name="title" required="true"/>
+		<parameter name="type" required="true"/>
+		<parameter name="question" required="true"/>
+		<parameter name="summary" required="false"/>
+		<parameter name="statusCd" required="true"/>
+		<parameter name="chgId" required="true"/>
+		<parameter name="externalRefId" required="false"/>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_WAITING_APPRVOVE_LIST" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT content.*, e.FIRST_NAME + ' ' + e.LAST_NAME AS REQUESTER_NAME,
+		        CAT1.CAT_NAME AS CONTENT_CAT_1_NAME,
+		        CAT2.CAT_NAME AS CONTENT_CAT_2_NAME, 
+		        CAT3.CAT_NAME AS CONTENT_CAT_3_NAME, 
+		        CAT4.CAT_NAME AS CONTENT_CAT_4_NAME, 
+		        CAT5.CAT_NAME AS CONTENT_CAT_5_NAME,
+		        status.CODE_NAME AS STATUS_NAME
+			FROM TP_KB_CONTENT content
+		
+			LEFT OUTER JOIN TP_USR_MASTER usr ON usr.[USER_ID] = content.CHG_ID
+			LEFT OUTER JOIN TP_EMPLOYEE e ON e.EMP_ID = usr.EMP_ID
+      		LEFT OUTER JOIN TP_KB_CONTENT_CAT1 CAT1 ON content.CONTENT_CAT_1_ID = CAT1.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT2 CAT2 ON content.CONTENT_CAT_2_ID = CAT2.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT3 CAT3 ON content.CONTENT_CAT_3_ID = CAT3.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT4 CAT4 ON content.CONTENT_CAT_4_ID = CAT4.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT5 CAT5 ON content.CONTENT_CAT_5_ID = CAT5.CONTENT_CAT_ID
+      		LEFT OUTER JOIN TP_CODEBOOK_LANG status ON status.CODE_TYPE = 'KB_CONTENT_STATUS' AND status.CODE_ID = content.STATUS_CD and status.LANG_CD = :langCd
+			WHERE content.STATUS_CD = '02'
+			${#ownerGroup?.text}
+			ORDER BY content.CONTENT_NUMBER
+		]]>
+		</query>
+		<parameter name="ownerGroup">AND content.REG_ID IN (:ownerGroup) </parameter>
+		<parameter name="langCd" required="true" />
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_KB_STATUS_CODE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			UPDATE TP_KB_CONTENT SET 
+			STATUS_CD = :statusCd,
+			APPROVE_ID = :approveId,
+			APPROVE_DT = GETDATE()
+			WHERE CONTENT_ID IN (:contentIdList)
+			
+		]]>
+		</query>
+		<parameter name="statusCd" required="true" />
+		<parameter name="contentIdList" required="true" />
+		<parameter name="approveId" required="true" />
+	</sql-service>
+	
+	<sql-service name="KB.SQL_UPDATE_KB_STATUS_CODE_2" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			UPDATE TP_KB_CONTENT SET 
+			STATUS_CD = :statusCd,
+			APPROVE_ID = :approveId,
+			APPROVE_DT = GETDATE()
+			WHERE CONTENT_ID = :contentId
+			
+		]]>
+		</query>
+		<parameter name="statusCd" required="true" />
+		<parameter name="contentId" required="true" />
+		<parameter name="approveId" required="true" />
+	</sql-service>
+	
+	<sql-service name="KB.SQL_FIND_CONTENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT * FROM TP_KB_CONTENT									
+			WHERE CONTENT_ID = :contentId
+			
+		]]>
+		</query>
+		<parameter name="contentId" required="true" />
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_CONTENT" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+		
+			SELECT CONTENT.CONTENT_ID,
+				CONTENT.CONTENT_CAT_1_ID,
+				CAT1.CAT_NAME AS CONTENT_CAT_1_NAME,
+				CONTENT.CONTENT_CAT_2_ID,
+				CAT2.CAT_NAME AS CONTENT_CAT_2_NAME, 
+				CONTENT.CONTENT_CAT_3_ID,
+				CAT3.CAT_NAME AS CONTENT_CAT_3_NAME, 
+				CONTENT.CONTENT_CAT_4_ID,
+				CAT4.CAT_NAME AS CONTENT_CAT_4_NAME, 
+				CONTENT.CONTENT_CAT_5_ID,
+				CAT5.CAT_NAME AS CONTENT_CAT_5_NAME,
+				CAT1.CONTENT_CAT_ID,
+				CONTENT.CONTENT_NUMBER,
+				CONTENT.REF_ID, 
+				CONTENT.[TYPE], 
+				CONTENT.TITLE, 
+				CONTENT.QUESTION, 
+				CONTENT.SUMMARY, 
+				CONTENT.STATUS_CD
+			FROM TP_KB_CONTENT CONTENT
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT1 CAT1 ON CONTENT.CONTENT_CAT_1_ID = CAT1.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT2 CAT2 ON CONTENT.CONTENT_CAT_2_ID = CAT2.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT3 CAT3 ON CONTENT.CONTENT_CAT_3_ID = CAT3.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT4 CAT4 ON CONTENT.CONTENT_CAT_4_ID = CAT4.CONTENT_CAT_ID
+			LEFT OUTER JOIN TP_KB_CONTENT_CAT5 CAT5 ON CONTENT.CONTENT_CAT_5_ID = CAT5.CONTENT_CAT_ID
+			
+			WHERE CONTENT.STATUS_CD = '03'
+			AND CONTENT.CONTENT_CAT_1_ID = :contentCat1Id
+			${#contentCat2Id?.text}
+			${#contentCat3Id?.text}
+			${#contentCat4Id?.text}
+			${#contentCat5Id?.text}
+		]]>
+		</query>
+		<parameter name="contentCat1Id" required="true"></parameter>
+		<parameter name="contentCat2Id" required="false">AND CONTENT.CONTENT_CAT_2_ID = :contentCat2Id</parameter>
+		<parameter name="contentCat3Id" required="false">AND CONTENT.CONTENT_CAT_3_ID = :contentCat3Id</parameter>
+		<parameter name="contentCat4Id" required="false">AND CONTENT.CONTENT_CAT_4_ID = :contentCat4Id</parameter>
+		<parameter name="contentCat5Id" required="false">AND CONTENT.CONTENT_CAT_5_ID = :contentCat5Id</parameter>
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_CATEGORY1" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *, 1 AS LEVEL 
+			FROM TP_KB_CONTENT_CAT1
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true" />
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_CATEGORY2" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *, 2 AS LEVEL
+			FROM TP_KB_CONTENT_CAT2
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true" />
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_CATEGORY3" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *, 3 AS LEVEL
+			FROM TP_KB_CONTENT_CAT3
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true" />
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_CATEGORY4" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *, 4 AS LEVEL
+			FROM TP_KB_CONTENT_CAT4
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true" />
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_CATEGORY5" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT *, 5 AS LEVEL
+			FROM TP_KB_CONTENT_CAT5
+			WHERE CONTENT_CAT_ID = :contentCatId
+		]]>
+		</query>
+		<parameter name="contentCatId" required="true" />
+		
+	</sql-service>
+	
+	<sql-service name="KB.SQL_EXPORT_ALL_CATEGORY" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT
+				c1.content_cat_id AS CONTENT_CAT_1_ID
+				,c1.cat_name AS CONTENT_CAT_1_NAME
+				,c2.CONTENT_CAT_ID AS CONTENT_CAT_2_ID
+				,c2.cat_name AS CONTENT_CAT_2_NAME
+				,c3.CONTENT_CAT_ID AS CONTENT_CAT_3_ID
+				,c3.cat_name  AS CONTENT_CAT_3_NAME
+				,c4.CONTENT_CAT_ID  AS CONTENT_CAT_4_ID
+				,c4.cat_name  AS CONTENT_CAT_4_NAME
+				,c5.CONTENT_CAT_ID  AS CONTENT_CAT_5_ID
+				,c5.cat_name  AS CONTENT_CAT_5_NAME
+			FROM 
+				TP_KB_CONTENT_CAT1 c1
+				,TP_KB_CONTENT_CAT2 c2
+				,TP_KB_CONTENT_CAT3 c3
+				,TP_KB_CONTENT_CAT4 c4
+				,TP_KB_CONTENT_CAT5 c5
+			WHERE c5.parent_cat_id=c4.content_cat_id
+			AND c4.parent_cat_id=c3.content_cat_id
+			AND c3.parent_cat_id=c2.content_cat_id
+			AND c2.parent_cat_id=c1.content_cat_id
+			ORDER BY 
+			c1.cat_name
+			,c2.cat_name
+			,c3.cat_name
+			,c4.cat_name
+			,c5.cat_name
+		]]>
+		</query>
+		
+	</sql-service>
+	
+</query-collection>

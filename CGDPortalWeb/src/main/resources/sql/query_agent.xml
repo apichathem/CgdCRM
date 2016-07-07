@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="AGENT.SQL_AGENT_BY_AGENT_CODE" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT 
+				*
+				, 'นาย' AS TITLE_NAME
+				, 'โคราช' AS BRANCH_NAME
+				, 'เมืองปัก' AS TUMBON_NAME
+				, 'ปักธงชัย' AS AMPHUR_NAME
+				, 'นครราชสีมา' AS PROVINCE_NAME
+		  	FROM TP_AGENT_PROFILE
+		  	WHERE 1=1 AND		  
+		  	AGENT_CODE = :AGENT_CODE
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true" />
+	</sql-service>
+	<sql-service name="AGENT.SQL_CHECK_AGENT_REGISTER_LOG" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			SELECT COUNT(1)
+		  	FROM TP_AGENT_REGISTER_LOG
+		  	WHERE AGENT_CODE = :AGENT_CODE
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true" />
+	</sql-service>
+	<sql-service name="AGENT.SQL_INSERT_AGENT_REGISTER_LOG" type="named-parameter" showSql="true">
+		<description></description>		
+		<query><![CDATA[	
+			INSERT INTO TP_AGENT_REGISTER_LOG (AGENT_CODE, REG_DT,CHG_DT)
+		  	VALUES (:AGENT_CODE, NOW(), NOW())
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true" />
+	</sql-service>
+	<sql-service name="AGENT.SQL_AGENT_SCORE_TOP_10" type="named-parameter" showSql="true">
+		<query><![CDATA[
+			SELECT 
+				B.AGENT_CODE
+				, CONCAT(B.FIRST_NAME, ' ', B.LAST_NAME) AS AGENT_NAME
+				, 'สาขากรุงเทพมหานคร' AS BRANCH_NAME
+				, TOTAL
+				, RANK 
+			FROM (
+				SELECT AGENT_CODE, TOTAL, RANK FROM
+				(
+					SELECT AGENT_CODE, TOTAL,
+						@CURRANK := IF(@PREVRANK = TOTAL, @CURRANK, @INCRANK) AS RANK, 
+						@INCRANK := @INCRANK + 1, 
+						@PREVRANK := TOTAL
+					FROM 
+					(
+						SELECT AGENT_CODE, SUM(SCORE) AS TOTAL 
+						FROM TP_ACTIVITY_LOG 
+						WHERE DATETIME BETWEEN :START_DATE AND :END_DATE
+						GROUP BY AGENT_CODE	
+						ORDER BY TOTAL DESC	
+					) P
+					, (SELECT @CURRANK := 0, @PREVRANK := NULL, @INCRANK := 1) V 
+					ORDER BY RANK ASC
+				) S
+				WHERE AGENT_CODE = :AGENT_CODE
+				UNION ALL
+				SELECT AGENT_CODE, TOTAL, RANK FROM
+				(
+					SELECT AGENT_CODE, TOTAL,
+						@CURRANK2 := IF(@PREVRANK2 = TOTAL, @CURRANK2, @INCRANK2) AS RANK, 
+						@INCRANK2 := @INCRANK2 + 1, 
+						@PREVRANK2 := TOTAL
+					FROM 
+					(
+						SELECT AGENT_CODE, SUM(SCORE) AS TOTAL 
+						FROM TP_ACTIVITY_LOG 
+						WHERE DATETIME BETWEEN :START_DATE AND :END_DATE
+						GROUP BY AGENT_CODE	
+						ORDER BY TOTAL DESC	
+					) P
+					, (SELECT @CURRANK2 := 0, @PREVRANK2 := NULL, @INCRANK2 := 1) V 
+					ORDER BY RANK ASC
+				) S
+				WHERE RANK <= 10
+			) A 
+			INNER JOIN TP_AGENT_PROFILE B ON A.AGENT_CODE = B.AGENT_CODE	
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true" />
+		<parameter name="START_DATE" required="true" />
+		<parameter name="END_DATE" required="true" />
+	</sql-service>	
+	<sql-service name="AGENT.SQL_AGENT_SCORE_NEAR_BY" type="named-parameter" showSql="true">
+		<query><![CDATA[	
+			SELECT 
+				B.AGENT_CODE
+				, CONCAT(B.FIRST_NAME, ' ', B.LAST_NAME) AS AGENT_NAME
+				, 'สาขากรุงเทพมหานคร' AS BRANCH_NAME
+				, TOTAL
+				, RANK 
+			FROM (	
+				SELECT AGENT_CODE, TOTAL, RANK, MYRANK FROM
+				(
+					SELECT AGENT_CODE, TOTAL, MYRANK,
+						@CURRANK := IF(@PREVRANK = TOTAL, @CURRANK, @INCRANK) AS RANK, 
+						@INCRANK := @INCRANK + 1, 
+						@PREVRANK := TOTAL
+					FROM 
+					(
+						SELECT AGENT_CODE, SUM(SCORE) AS TOTAL 
+						FROM TP_ACTIVITY_LOG 
+						WHERE DATETIME BETWEEN :START_DATE AND :END_DATE
+						GROUP BY AGENT_CODE	
+						ORDER BY TOTAL DESC	
+					) P
+					, (SELECT @CURRANK := 0, @PREVRANK := NULL, @INCRANK := 1) V 
+					, (
+						SELECT RANK AS MYRANK FROM
+						(
+							SELECT AGENT_CODE, TOTAL,
+								@CURRANK2 := IF(@PREVRANK2 = TOTAL, @CURRANK2, @INCRANK2) AS RANK, 
+								@INCRANK2 := @INCRANK2 + 1, 
+								@PREVRANK2 := TOTAL
+							FROM 
+							(
+								SELECT AGENT_CODE, SUM(SCORE) AS TOTAL 
+								FROM TP_ACTIVITY_LOG 
+								WHERE DATETIME BETWEEN :START_DATE AND :END_DATE
+								GROUP BY AGENT_CODE	
+								ORDER BY TOTAL DESC	
+							) P
+							, (SELECT @CURRANK2 := 0, @PREVRANK2 := NULL, @INCRANK2 := 1) V 
+							ORDER BY RANK ASC
+						) S
+						WHERE AGENT_CODE = :AGENT_CODE					
+					) C		
+					ORDER BY RANK ASC
+				) S
+				WHERE RANK BETWEEN MYRANK - :DIFF AND MYRANK + :DIFF
+			) A 
+			INNER JOIN TP_AGENT_PROFILE B ON A.AGENT_CODE = B.AGENT_CODE	
+		]]>
+		</query>
+		<parameter name="AGENT_CODE" required="true" />
+		<parameter name="START_DATE" required="true" />
+		<parameter name="END_DATE" required="true" />
+		<parameter name="DIFF" required="true" />
+	</sql-service>	
+</query-collection>

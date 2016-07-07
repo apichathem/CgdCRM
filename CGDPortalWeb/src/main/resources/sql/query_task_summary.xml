@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+    <sql-service name="MYTASK.SQL_FIND_SERVICE_REQUEST" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+               SELECT	
+					 SR.SR_NUMBER AS  srNumber
+					,CAT1.CAT_NAME  AS  srTypeProblem1
+	        		,CAT2.CAT_NAME  AS  srTypeProblem2
+	        		,CAT3.CAT_NAME  AS  srTypeProblem3
+	        		,CAT4.CAT_NAME  AS  srTypeProblem4
+	        		,CAT5.CAT_NAME  AS  srTypeProblem5
+					,CB3.CODE_NAME  AS  srStatusDesc
+			        ,sla.SLA_NAME AS  srPriorityDesc
+			        ,SR.TITLE AS srSubject
+					,SR.OPENED_DT  AS  srOpenedDate
+					,SR.DUE_DT  AS  srDueDate
+					,SR.CLOSED_DT  AS  srCloseDate
+					, ISNULL(EMP1.FIRST_NAME, '')+' '+ISNULL(EMP1.LAST_NAME,'') AS  srOwnerName
+				 	
+					,SR.SR_TYPE_PROBLEM1 AS  srTypeProblem1Cd
+					,SR.SR_TYPE_PROBLEM2 AS  srTypeProblem2Cd
+					,SR.SR_TYPE_PROBLEM3 AS  srTypeProblem3Cd
+					,SR.SR_TYPE_PROBLEM4 AS  srTypeProblem4Cd
+					,SR.SR_TYPE_PROBLEM5 AS  srTypeProblem5Cd
+				 
+					,SR.PRIORITY_CD AS  srpriorityCd
+					,SR.STATUS_CD  AS  srStatusCd
+					,SR.OWNER_ID  AS  srOwnerId				
+					,SR.CUST_ID  AS  srCustId
+					,SR.CHANNEL_CD  AS  srChannelCd
+					,CB5.CODE_NAME  AS  srChannelName
+					,CASE SR.CUST_TYPE_CD 										
+						WHEN 'I' THEN ISNULL(CUST_IND.FIRST_NAME, '')+' '+ISNULL(CUST_IND.LAST_NAME,'') 									
+						ELSE CUST_CORP.COMPANY_NAME									
+					  END AS  customerName
+					,SR.REG_ID  AS  regId
+					,SR.REG_DT  AS  regDt
+					,ISNULL(EMP2.FIRST_NAME, '')+' '+ISNULL(EMP2.LAST_NAME,'') AS regName										
+					,ISNULL(EMP3.FIRST_NAME, '')+' '+ISNULL(EMP3.LAST_NAME,'') AS chgName		
+					  
+				FROM TP_SR SR 										
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT1 CAT1 ON SR.SR_TYPE_PROBLEM1 = CAT1.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT2 CAT2 ON SR.SR_TYPE_PROBLEM2 = CAT2.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT3 CAT3 ON SR.SR_TYPE_PROBLEM3 = CAT3.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT4 CAT4 ON SR.SR_TYPE_PROBLEM4 = CAT4.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT5 CAT5 ON SR.SR_TYPE_PROBLEM5 = CAT5.CONTENT_CAT_ID									
+				LEFT  OUTER JOIN TP_CODEBOOK_LANG CB3 ON SR.STATUS_CD = CB3.CODE_ID AND CB3.CODE_TYPE = 'SRQ_STATUS'	AND CB3.LANG_CD = :langCd
+				LEFT  OUTER JOIN TP_SLA sla ON sla.SLA_ID = SR.SLA_ID									
+				LEFT  OUTER JOIN TP_CODEBOOK_LANG CB5 ON SR.PRIORITY_CD = CB5.CODE_ID AND CB5.CODE_TYPE = 'SRQ_CHANNEL'	AND CB5.LANG_CD = :langCd
+				LEFT  OUTER JOIN TP_USR_MASTER USR1 ON SR.OWNER_ID = USR1.USER_ID										
+				LEFT  OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID										
+				LEFT  OUTER JOIN TP_USR_MASTER USR2 ON SR.REG_ID = USR2.USER_ID										
+				LEFT  OUTER JOIN TP_EMPLOYEE EMP2 ON USR2.EMP_ID = EMP2.EMP_ID										
+				LEFT  OUTER JOIN TP_USR_MASTER USR3 ON SR.CHG_ID = USR3.USER_ID										
+				LEFT  OUTER JOIN TP_EMPLOYEE EMP3 ON USR3.EMP_ID = EMP3.EMP_ID										
+				LEFT  OUTER JOIN TP_CUST_MASTER CUST ON SR.CUST_ID = CUST.CUST_ID  										
+				LEFT  OUTER JOIN TP_INDIVIDUAL CUST_IND ON CUST.IND_ID = CUST_IND.IND_ID 										
+				LEFT  OUTER JOIN TP_CORPORATION CUST_CORP ON CUST.CORP_ID = CUST_CORP.CORP_ID										
+        WHERE 1=1
+        AND SR.SR_GROUP = 'SR'
+        AND SR.STATUS_CD NOT IN (03,04) --Close and cancel
+        ${#userId?.text}
+        ${#ownerGroup?.text}
+        
+        ORDER BY SR.DUE_DT
+        ]]>
+        </query>
+         <parameter name='userId'> AND USR1.USER_ID = :userId </parameter>
+         <parameter name="ownerGroup">AND OWNER_ID IN (:ownerGroup) </parameter>
+         <parameter name='langCd' required="true" />
+    </sql-service>
+    
+    <sql-service name="MYTASK.SQL_FIND_ACTIVITY" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[
+            SELECT  ACT.ACT_NUMBER
+                    , ACT.TITLE
+                    , CASE SUBSTRING(ACT.REF_DOC_NO, 0,3)
+                        WHEN 'SR' THEN 'Service Reqeust'
+                        WHEN 'CP' THEN 'Complaint'
+                        WHEN 'IN' THEN 'Incidental'
+                      END AS 'ACT_MENU'
+                    , CASE ISNULL(ACT.OWNER_ID, 0)
+                        WHEN 0 THEN ISNULL(EMP1.FIRST_NAME,'')+' '+ISNULL(EMP1.LAST_NAME, '')
+                        ELSE  DEPT.CODE_NAME
+                      END AS ASSIGNED_TO_NAME
+                    , CBL1.CODE_NAME AS ACT_TYPE_NAME
+                    , CBL2.CODE_NAME AS ACT_STATUS_NAME
+                    , ACT.OWNER_ID AS OWNER_ID
+                    , ISNULL(EMP2.FIRST_NAME, '')+' '+ISNULL(EMP2.LAST_NAME,'') AS REG_NAME
+                    , CONVERT(VARCHAR, ACT.REG_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.REG_DT, 108) AS REG_DATETIME
+                    , CONVERT(VARCHAR, ACT.DUE_DT, 103) + '  ' + CONVERT(VARCHAR, ACT.DUE_DT, 108) AS DUE_DATETIME
+            FROM    TP_ACTIVITY ACT
+            LEFT    OUTER JOIN TP_CODEBOOK_LANG CBL1 ON ACT.TYPE_CD = CBL1.CODE_ID AND CBL1.CODE_TYPE = 'ACT_TYPE' AND CBL1.LANG_CD = :langCd
+            LEFT    OUTER JOIN TP_CODEBOOK_LANG CBL2 ON ACT.STATUS_CD = CBL2.CODE_ID AND CBL2.CODE_TYPE = 'ACT_STATUS' AND CBL2.LANG_CD = :langCd
+            LEFT    OUTER JOIN TP_USR_MASTER USR1 ON ACT.OWNER_ID  = USR1.USER_ID 
+            LEFT    OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID
+            --LEFT    OUTER JOIN TP_DEPARTMENT DEPT ON ACT.OWNER_DEPT_CODE = DEPT.DEPT_CODE
+            LEFT OUTER JOIN TP_CODEBOOK_LANG DEPT ON DEPT.CODE_TYPE = 'DEPARTMENT' AND DEPT.CODE_ID = ACT.OWNER_DEPT_CODE AND DEPT.LANG_CD = :langCd
+            LEFT    OUTER JOIN TP_USR_MASTER USR2 ON ACT.REG_ID = USR2.USER_ID                      
+            LEFT    OUTER JOIN TP_EMPLOYEE EMP2 ON USR2.EMP_ID = EMP2.EMP_ID
+            WHERE 1=1
+            AND ACT.STATUS_CD NOT IN (03,04)
+            ${#userId?.text}
+            ${#ownerGroup?.text}
+            ORDER BY ACT.DUE_DT
+        ]]>
+        </query>
+         <parameter name='userId'> AND USR1.USER_ID = :userId </parameter>
+         <parameter name="ownerGroup">AND OWNER_ID IN (:ownerGroup) </parameter>
+         <parameter name='langCd' required="true" />
+    </sql-service>
+    
+    <sql-service name="MYTASK.SQL_FIND_KB" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[
+           	SELECT c.*, e.FIRST_NAME + ' ' + e.LAST_NAME AS APPROVE_NAME
+			FROM TP_KB_CONTENT c
+			LEFT OUTER JOIN TP_USR_MASTER u ON u.[USER_ID] = c.APPROVE_ID
+			LEFT OUTER JOIN TP_EMPLOYEE e ON u.EMP_ID = e.EMP_ID
+			WHERE c.STATUS_CD = '04'
+			${#ownerGroup?.text}
+			ORDER BY c.CHG_DT,c.APPROVE_DT
+        ]]>
+        </query>
+          <parameter name="ownerGroup">AND c.REG_ID IN (:ownerGroup) </parameter>
+    </sql-service>
+    
+    <sql-service name="MYTASK.SQL_COUNT_PENDING_ACTIVITY" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+            SELECT count(1) FROM    TP_ACTIVITY ACT
+            LEFT    OUTER JOIN TP_USR_MASTER USR1 ON ACT.OWNER_ID  = USR1.USER_ID 
+            WHERE USR1.USER_ID = :userId
+            AND ACT.STATUS_CD NOT IN (03,04)
+            ${#ownerGroup?.text}
+        ]]>
+        </query>
+        <parameter name="ownerGroup">AND OWNER_ID IN (:ownerGroup) </parameter>
+        <parameter name="userId" required="true"/>
+    </sql-service>
+    
+    <sql-service name="MYTASK.SQL_COUNT_PENDING_SR" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+            SELECT count(1) FROM TP_SR SR
+            LEFT    OUTER JOIN TP_USR_MASTER USR1 ON SR.OWNER_ID = USR1.USER_ID
+            WHERE   SR.SR_GROUP = 'SR'
+            AND USR1.USER_ID = :userId
+            AND SR.STATUS_CD NOT IN (03,04)
+            ${#ownerGroup?.text}
+        ]]>
+        </query>
+        <parameter name="ownerGroup">AND OWNER_ID IN (:ownerGroup) </parameter>
+        <parameter name="userId" required="true"/>
+    </sql-service>
+    
+    <sql-service name="MYTASK.SQL_COUNT_REJECTED_KB" type="named-parameter" showSql="true">
+        <description></description>     
+        <query><![CDATA[    
+        
+            SELECT count(1) FROM TP_KB_CONTENT
+			WHERE STATUS_CD = '04'
+			${#userId?.text}
+        ]]>
+        </query>
+        <parameter name="userId" required="true"/>
+    </sql-service>
+	
+</query-collection>

@@ -1,0 +1,1562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query-collection>
+	<sql-service name="CUST.SQL_FIND_CUSTOMER_LIST" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[	
+			select  a.CUST_ID,
+					a.CUST_NAME, 
+					cb.CODE_ID as CUST_TYPE_CD,
+				   	cb.CODE_NAME as CUST_TYPE_NAME,
+ 					cb1.CODE_NAME as INDUSTRY_NAME, 
+ 					case 
+					  when a.TYPE_CD = 'I' then b.MOBILE_NO
+					  when a.TYPE_CD = 'C' then c.WORK_PHONE
+  					  else '' 
+ 					end as WORK_PHONE,
+					case 
+					  when a.TYPE_CD = 'I' then b.EMAIL
+					  when a.TYPE_CD = 'C' then c.EMAIL
+					  else '' 
+					end as EMAIL,
+ 					emp.FIRST_NAME + ' ' + emp.LAST_NAME as OWNER_NAME,
+ 					cb2.CODE_NAME as STATUS_NAME,
+                    a.OWNER_ID
+			from TP_CUST_MASTER a 
+			left outer join TP_INDIVIDUAL b on a.IND_ID = b.IND_ID
+			left outer join TP_CORPORATION c on a.CORP_ID = c.CORP_ID
+			left outer join TP_CODEBOOK_LANG cb on cb.CODE_TYPE = 'CUST_TYPE' and a.TYPE_CD = cb.CODE_ID and cb.LANG_CD = :langCd
+			left outer join TP_CODEBOOK_LANG cb1 on cb1.CODE_TYPE = 'INDUSTRY_TYPE' and c.INDUSTRY_CD = cb1.CODE_ID and cb1.LANG_CD = :langCd
+			left outer join TP_CODEBOOK_LANG cb2 on cb2.CODE_TYPE = 'CUST_STATUS' and a.STATUS_CD = cb2.CODE_ID and cb2.LANG_CD = :langCd
+			left outer join TP_USR_MASTER usr on a.OWNER_ID = usr.USER_ID
+			left outer join TP_EMPLOYEE emp on usr.EMP_ID = emp.EMP_ID
+			where 1 = 1
+			${#ownerGroup?.text}
+			${#custType?.text}
+			${#custFullName?.text}
+			${#custIndustry?.text}
+			${#custOwner?.text}
+			${#custFirstName?.text}
+			${#custRegistId?.text}
+			${#custStatus?.text}
+			${#custLastName?.text}
+			${#custTaxId?.text}
+			${#custMobile?.text}
+			${#custOffice?.text}
+			${#custCitizenId?.text}
+			${#custJobTitle?.text}
+			ORDER BY a.REG_DT DESC
+		]]>
+		</query>
+		
+<!-- 		<parameter name='custFullName'> AND a.CUST_NAME = :custFullName </parameter> -->
+<!-- 		<parameter name='custFirstName'> AND b.FIRST_NAME = :custFirstName </parameter> -->
+<!-- 		<parameter name='custLastName'> AND b.LAST_NAME = :custLastName </parameter> -->
+<!-- 		<parameter name='custMobile'> AND b.MOBILE_NO = :custMobile </parameter> -->
+
+		<parameter name='custFullName'  prefix="%" suffix="%"> AND a.CUST_NAME like :custFullName </parameter>
+		<parameter name='custFirstName' prefix="%" suffix="%"> AND b.FIRST_NAME like :custFirstName </parameter>
+		<parameter name='custLastName'  prefix="%" suffix="%"> AND b.LAST_NAME like :custLastName </parameter>
+		<parameter name='custType'> AND a.TYPE_CD = :custType </parameter>
+		<parameter name='custIndustry'> AND c.INDUSTRY_CD = :custIndustry </parameter>
+		<parameter name='custOwner'>AND a.OWNER_ID = :custOwner </parameter>
+		<parameter name='custRegistId'> AND c.REGISTRATION_ID = :custRegistId </parameter>
+		<parameter name='custStatus'> AND a.STATUS_CD = :custStatus </parameter>
+		<parameter name='custTaxId'> AND c.TAX_ID = :custTaxId </parameter>
+		<parameter name='custMobile' prefix="%"> AND b.MOBILE_NO like :custMobile </parameter>
+		<parameter name='custOffice'> AND c.WORK_PHONE = :custOffice </parameter>
+		<parameter name='custCitizenId'> AND b.CITIZEN_ID = :custCitizenId </parameter>
+		<parameter name='custJobTitle'> AND b.JOB_TITLE_CD = :custJobTitle </parameter>
+		<parameter name="ownerGroup">AND OWNER_ID IN (:ownerGroup) </parameter>
+		<parameter name='langCd' required="true" />
+		
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUST_DETAIL_INDIVIDUAL" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			SELECT 
+				CM.CUST_ID,
+			    CM.TYPE_CD,
+			    CM.CUST_CODE,
+			    IND.IND_ID,
+			    IND.TITLE_CD,
+			    IND.FIRST_NAME,
+			    IND.LAST_NAME,
+			    IND.MID_NAME,
+			    CM.STATUS_CD,
+			    CM.CONTACT_CHANNEL_CD,
+			    IND.HOME_PHONE,
+			    IND.MOBILE_NO,
+			    IND.WORK_PHONE,
+			    IND.FAX_PHONE,
+		        IND.HOME_PHONE_EXT,
+			    IND.MOBILE_NO_EXT,
+			    IND.WORK_PHONE_EXT,
+			    IND.FAX_PHONE,
+			    IND.EMAIL,
+			    EMP.FIRST_NAME + ' ' + EMP.LAST_NAME as OWNER_NAME,
+			    CM.OWNER_ID,
+			    CM.COMMENT,
+			    IND.ADDR_1,
+			    IND.ADDR_2,
+			    IND.SUB_AREA,
+			    IND.AREA,
+			    IND.PROVINCE,
+			    IND.POSTAL_CODE,
+			    IND.COUNTRY_CD,
+			    CM.NOT_CALL_YN,
+			    CM.NOT_SMS_YN,
+			    CM.NOT_EMAIL_YN,
+			    CM.NOT_MAIL_YN,
+				IND.MINISTRY,
+				IND.DEPARTMENT,
+				IND.DIVISIONDEPT,
+				IND.POSITION,
+				IND.PROVINCE_ID,
+				IND.CITIZEN_ID
+				
+			FROM TP_CUST_MASTER CM
+			INNER JOIN TP_INDIVIDUAL IND ON IND.IND_ID = CM.IND_ID
+			LEFT OUTER JOIN TP_USR_MASTER USR ON CM.OWNER_ID = USR.USER_ID
+			LEFT OUTER JOIN TP_EMPLOYEE EMP ON USR.EMP_ID = EMP.EMP_ID
+			WHERE 1=1
+			${#custId?.text}
+		]]>
+		</query>
+		<parameter name="custId"> AND CM.CUST_ID = :custId </parameter>
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUST_DETAIL_CORPORATE" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			SELECT CM.CUST_ID,
+				CM.TYPE_CD,
+				CP.CORP_ID,
+				CP.WORK_PHONE,
+				CP.WORK_PHONE_EXT,
+				CP.FAX_PHONE,
+				CP.ADDR_1,
+				CP.ADDR_2,
+				CM.CUST_CODE,
+				CP.COMPANY_NAME,
+				CP.EMAIL,
+				CP.SUB_AREA,
+				CP.INDUSTRY_CD,
+				EMP.FIRST_NAME + ' ' + EMP.LAST_NAME as OWNER_NAME,
+				CM.OWNER_ID,
+				CP.URL,
+				CP.AREA,
+				CM.STATUS_CD,
+				CP.PROVINCE,
+				CM.CONTACT_CHANNEL_CD,
+				CP.POSTAL_CODE,
+				CP.COUNTRY_CD,
+				CP.REGISTRATION_ID,
+				CP.TAX_ID,
+				CP.REVENUE_CD,
+				CP.COMPANY_SIZE_CD,
+				CM.COMMENT,
+				CM.NOT_CALL_YN,
+				CM.NOT_SMS_YN,
+				CM.NOT_EMAIL_YN,
+				CM.NOT_MAIL_YN
+			FROM
+			  TP_CUST_MASTER CM 
+			  INNER JOIN TP_CORPORATION CP ON CM.CORP_ID = CP.CORP_ID
+			  LEFT OUTER JOIN TP_USR_MASTER USR ON CM.OWNER_ID = USR.USER_ID
+			  LEFT OUTER JOIN TP_EMPLOYEE EMP ON USR.EMP_ID = EMP.EMP_ID
+			WHERE 1=1
+			${#custId?.text}
+		]]>
+		</query>
+		<parameter name="custId"> AND CM.CUST_ID = :custId </parameter>
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUSTOMER_BY_CODE" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+            SELECT CM.CUST_ID,
+                CM.TYPE_CD,
+                CM.CUST_CODE,
+                CM.STATUS_CD,
+                CM.CONTACT_CHANNEL_CD,
+                CM.OWNER_ID,
+                CM.COMMENT,
+                CM.NOT_CALL_YN,
+                CM.NOT_SMS_YN,
+                CM.NOT_EMAIL_YN,
+                CM.NOT_MAIL_YN
+            FROM TP_CUST_MASTER CM
+            WHERE CM.CUST_CODE = :custCode
+            
+        ]]>
+		</query>
+		<parameter name="custCode" required="false" />
+	</sql-service>
+
+
+	<sql-service name="CUST.SQL_FIND_MORE_INFO_INDIVIDUAL" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			SELECT 
+				CM.CUST_ID,
+				IND.IND_ID,
+			    IND.GENDER_CD,
+			    IND.MARITAL_STATUS_CD,
+			    IND.RACE_CD,
+			    IND.NATIONALITY_CD,
+			    IND.BIRTH_DT,
+			    IND.CITIZEN_ID,
+			    CM.SEGMENT_CD,
+			    IND.EDUCATION_CD,
+			    IND.INCOME_CD,
+			    IND.OCCUPATION_CD,
+			    IND.JOB_TITLE_CD
+			FROM TP_CUST_MASTER CM
+			INNER JOIN TP_INDIVIDUAL IND ON IND.IND_ID = CM.IND_ID
+			WHERE 1=1
+			${#custId?.text}
+		]]>
+		</query>
+		<parameter name="custId"> AND CM.CUST_ID = :custId </parameter>
+	</sql-service>
+
+	<sql-service name="CUST.INSERT_CUST_INDIVIDUAL" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			INSERT INTO TP_INDIVIDUAL (
+				   TITLE_CD
+				  ,FIRST_NAME
+				  ,MID_NAME
+				  ,LAST_NAME
+				  ,NICK_NAME
+				  ,CITIZEN_ID
+				  ,PASSPORT_NO
+				  ,GENDER_CD
+				  ,BIRTH_DT
+				  ,NATIONALITY_CD
+				  ,RACE_CD
+				  ,OCCUPATION_CD
+				  ,INCOME_CD
+				  ,JOB_TITLE_CD
+				  ,EDUCATION_CD
+				  ,MARITAL_STATUS_CD
+				  ,HOUSEHOLD_SIZE
+				  ,INTEREST_CD
+				  ,MOBILE_NO
+				  ,HOME_PHONE
+				  ,WORK_PHONE
+				  ,MOBILE_NO_EXT
+				  ,HOME_PHONE_EXT
+				  ,WORK_PHONE_EXT
+				  ,FAX_PHONE
+				  ,EXT_NO
+				  ,ADDR_1
+				  ,ADDR_2
+				  ,SUB_AREA
+				  ,AREA
+				  ,PROVINCE
+				  ,COUNTRY_CD
+				  ,POSTAL_CODE
+				  ,EMAIL
+				  ,MINISTRY
+				  ,DEPARTMENT
+				  ,DIVISIONDEPT
+				  ,POSITION
+				  ,PROVINCE_ID
+				  ,REG_ID
+				  ,REG_DT
+				) VALUES (
+				   :titleCd 
+				  ,:firstName 
+				  ,:midName 
+				  ,:lastName 
+				  ,:nickName 
+				  ,:citizenId  
+				  ,:passportNo  
+				  ,:genderCd  
+				  ,:birthDt  
+				  ,:nationalityCd  
+				  ,:raceCd  
+				  ,:occupationCd  
+				  ,:incomeCd  
+				  ,:jobTitleCd  
+				  ,:educationCd  
+				  ,:maritalStatusCd  
+				  ,:householdSize  
+				  ,:interestCd 
+				  ,:mobileNo  
+				  ,:homePhone  
+				  ,:workPhone
+				  ,:mobileNoExt  
+				  ,:homePhoneExt  
+				  ,:workPhoneExt 
+				  ,:faxPhone  
+				  ,:extNo 
+				  ,:addr1 
+				  ,:addr2 
+				  ,:subArea 
+				  ,:area 
+				  ,:province 
+				  ,:countryCd 
+				  ,:postalCode  
+				  ,:email  
+				  ,:ministry
+				  ,:department
+				  ,:divisionDept
+				  ,:position
+				  ,:provinceId
+				  ,:regId  
+				  ,:regDt  
+				) 
+		]]>
+		</query>
+		<parameter name="titleCd" required="false" />
+		<parameter name="firstName" required="false" />
+		<parameter name="midName" required="false" />
+		<parameter name="lastName" required="false" />
+		<parameter name="nickName" required="false" />
+		<parameter name="citizenId" required="false" />
+		<parameter name="passportNo" required="false" />
+		<parameter name="genderCd" required="false" />
+		<parameter name="birthDt" required="false" />
+		<parameter name="nationalityCd" required="false" />
+		<parameter name="raceCd" required="false" />
+		<parameter name="occupationCd" required="false" />
+		<parameter name="incomeCd" required="false" />
+		<parameter name="jobTitleCd" required="false" />
+		<parameter name="educationCd" required="false" />
+		<parameter name="maritalStatusCd" required="false" />
+		<parameter name="householdSize" required="false" />
+		<parameter name="interestCd" required="false" />
+		<parameter name="mobileNo" required="false" />
+		<parameter name="homePhone" required="false" />
+		<parameter name="workPhone" required="false" />
+		
+		<parameter name="mobileNoExt" required="false" />
+		<parameter name="homePhoneExt" required="false" />
+		<parameter name="workPhoneExt" required="false" />
+		
+		<parameter name="faxPhone" required="false" />
+		<parameter name="extNo" required="false" />
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="ministry" required="false" />
+		<parameter name="department" required="false" />
+		<parameter name="divisionDept" required="false" />
+		<parameter name="position" required="false" />
+		<parameter name="provinceId" required="false" />
+		<parameter name="regId" required="false" />
+		<parameter name="regDt" required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.UPDATE_MORE_INFO" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			BEGIN TRANSACTION
+			BEGIN
+				UPDATE TP_INDIVIDUAL SET
+				   GENDER_CD = :genderCd
+				  ,BIRTH_DT = :birthDt
+				  ,NATIONALITY_CD = :nationalityCd
+				  ,RACE_CD = :raceCd
+				  ,OCCUPATION_CD = :occupationCd
+				  ,INCOME_CD = :incomeCd
+				  ,JOB_TITLE_CD = :jobTitleCd
+				  ,EDUCATION_CD = :educationCd
+				  ,MARITAL_STATUS_CD = :maritalStatusCd
+				  ,CHG_ID = :chgId
+				  ,CHG_DT = :chgDt
+				WHERE IND_ID = :indId
+			END
+			BEGIN
+				UPDATE TP_CUST_MASTER SET
+					 SEGMENT_CD = :segmentCd
+					,CHG_ID = :chgId
+				  	,CHG_DT = :chgDt
+				WHERE IND_ID = :indId
+			END
+			COMMIT TRANSACTION 
+		]]>
+		</query>
+		<parameter name="citizenId" required="false" />
+		<parameter name="genderCd" required="false" />
+		<parameter name="birthDt" required="false" />
+		<parameter name="nationalityCd" required="false" />
+		<parameter name="raceCd" required="false" />
+		<parameter name="occupationCd" required="false" />
+		<parameter name="incomeCd" required="false" />
+		<parameter name="jobTitleCd" required="false" />
+		<parameter name="educationCd" required="false" />
+		<parameter name="maritalStatusCd" required="false" />
+		<parameter name="segmentCd" required="false" />
+		<parameter name="chgId" required="true" />
+		<parameter name="chgDt" required="true" />
+		<parameter name="indId" required="true" />
+	</sql-service>
+
+	<sql-service name="CUST.UPDATE_CUST_INDIVIDUAL" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			BEGIN TRANSACTION
+				BEGIN
+					UPDATE TP_CUST_MASTER SET
+							 CUST_CODE = :custCode
+							,CUST_NAME = :custName
+							,STATUS_CD = :statusCd
+							,CONTACT_CHANNEL_CD = :contactChannelCd
+							,OWNER_ID = :ownerId
+							,COMMENT = :comment
+							,NOT_CALL_YN = :notCallYn
+							,NOT_SMS_YN = :notSmsYn
+							,NOT_EMAIL_YN = :notEmailYn
+							,NOT_MAIL_YN = :notMailYn
+							,CHG_ID = :chgId
+							,CHG_DT = :chgDt
+					WHERE IND_ID = :indId
+				END
+				
+				BEGIN
+					UPDATE TP_INDIVIDUAL SET
+						 TITLE_CD = :titleCd
+						,FIRST_NAME = :firstName
+						,MID_NAME = :midName
+						,LAST_NAME = :lastName
+						,CITIZEN_ID	= :citizenId
+						,MOBILE_NO = :mobileNo
+						,HOME_PHONE = :homePhone
+						,WORK_PHONE = :workPhone
+						,MOBILE_NO_EXT = :mobileNoExt
+						,HOME_PHONE_EXT = :homePhoneExt
+						,WORK_PHONE_EXT = :workPhoneExt
+						,FAX_PHONE = :faxPhone
+						,ADDR_1 = :addr1
+						,ADDR_2 = :addr2
+						,SUB_AREA = :subArea
+						,AREA = :area
+						,PROVINCE = :province
+						,COUNTRY_CD = :countryCd
+						,POSTAL_CODE = :postalCode
+						,EMAIL = :email
+						,CHG_ID = :chgId
+						,CHG_DT = :chgDt
+						,MINISTRY = :ministry
+						,DEPARTMENT = :department
+						,DIVISIONDEPT = :divisionDept
+						,POSITION = :position
+						,PROVINCE_ID= :provinceId
+						WHERE IND_ID = :indId
+				END
+			COMMIT TRANSACTION
+		]]>
+		</query>
+		<parameter name="indId" required="false" />
+		<parameter name="titleCd" required="false" />
+		<parameter name="firstName" required="false" />
+		<parameter name="midName" required="false" />
+		<parameter name="lastName" required="false" />
+		<parameter name="mobileNo" required="false" />
+		<parameter name="citizenId" required="false" />		
+		<parameter name="homePhone" required="false" />
+		<parameter name="workPhone" required="false" />
+		<parameter name="mobileNoExt" required="false" />
+		<parameter name="homePhoneExt" required="false" />
+		<parameter name="workPhoneExt" required="false" />
+		<parameter name="faxPhone" required="false" />
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="chgId" required="false" />
+		<parameter name="chgDt" required="false" />
+		<parameter name="custCode" required="false" />
+		<parameter name="custName" required="false" />
+		<parameter name="statusCd" required="false" />
+		<parameter name="contactChannelCd" required="false" />
+		<parameter name="ownerId" required="false" />
+		<parameter name="comment" required="false" />
+		<parameter name="notCallYn" required="false" />
+		<parameter name="notSmsYn" required="false" />
+		<parameter name="notEmailYn" required="false" />
+		<parameter name="notMailYn" required="false" />
+		<parameter name="ministry" required="false" />
+		<parameter name="department" required="false" />
+		<parameter name="divisionDept" required="false" />
+		<parameter name="provinceId" required="false" />
+		<parameter name="position" required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.INSERT_CUST_CORPORATION" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			INSERT INTO TP_CORPORATION (
+				   COMPANY_NAME
+				  ,ALT_NAME
+				  ,REGISTRATION_ID
+				  ,TAX_ID
+				  ,INDUSTRY_CD
+				  ,COMPANY_SIZE_CD
+				  ,REVENUE_CD
+				  ,WORK_PHONE
+				  ,WORK_PHONE_EXT
+				  ,FAX_PHONE
+				  ,ADDR_1
+				  ,ADDR_2
+				  ,SUB_AREA
+				  ,AREA
+				  ,PROVINCE
+				  ,COUNTRY_CD
+				  ,POSTAL_CODE
+				  ,EMAIL
+				  ,URL
+				  ,REG_ID
+				  ,REG_DT
+				) VALUES (
+				  :companyName
+				  ,:altName
+				  ,:registrationId 
+				  ,:taxId 
+				  ,:industryCd  
+				  ,:companySizeCd  
+				  ,:revenueCd  
+				  ,:workPhone 
+				  ,:workPhoneExt
+				  ,:faxPhone  
+				  ,:addr1
+				  ,:addr2
+				  ,:subArea 
+				  ,:area 
+				  ,:province 
+				  ,:countryCd 
+				  ,:postalCode  
+				  ,:email 
+				  ,:url 
+				  ,:regId  
+				  ,:regDt 
+				)
+		]]>
+		</query>
+		<parameter name="companyName" required="false" />
+		<parameter name="altName" required="false" />
+		<parameter name="registrationId" required="false" />
+		<parameter name="taxId" required="false" />
+		<parameter name="industryCd" required="false" />
+		<parameter name="companySizeCd" required="false" />
+		<parameter name="revenueCd" required="false" />
+		<parameter name="workPhone" required="false" />
+		<parameter name="workPhoneExt" required="false" />
+		<parameter name="faxPhone" required="false" />
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="url" required="false" />
+		<parameter name="regId" required="false" />
+		<parameter name="regDt" required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.UPDATE_CUST_CORPORATION" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			BEGIN TRANSACTION
+				BEGIN
+					UPDATE TP_CUST_MASTER SET
+					   CUST_CODE = :custCode
+					  ,CUST_NAME = :custName
+					  ,SEGMENT_CD = :segmentCd
+					  ,STATUS_CD = :statusCd
+					  ,CONTACT_CHANNEL_CD = :contactChannelCd
+					  ,OWNER_ID = :ownerId
+					  ,COMMENT = :comment
+					  ,NOT_CALL_YN = :notCallYn
+					  ,NOT_SMS_YN = :notSmsYn
+					  ,NOT_EMAIL_YN = :notEmailYn
+					  ,NOT_MAIL_YN = :notMailYn
+					  ,CHG_ID = :chgId
+					  ,CHG_DT = :chgDt
+					WHERE CORP_ID = :corpId
+				END
+				
+				BEGIN
+					UPDATE TP_CORPORATION SET
+					   COMPANY_NAME = :companyName
+					  ,REGISTRATION_ID = :registrationId
+					  ,TAX_ID = :taxId
+					  ,INDUSTRY_CD = :industryCd
+					  ,COMPANY_SIZE_CD = :companySizeCd
+					  ,REVENUE_CD = :revenueCd
+					  ,WORK_PHONE = :workPhone
+					  ,WORK_PHONE_EXT = :workPhoneExt
+					  ,FAX_PHONE = :faxPhone
+					  ,ADDR_1 = :addr1
+					  ,ADDR_2 = :addr2
+					  ,SUB_AREA = :subArea
+					  ,AREA = :area
+					  ,PROVINCE = :province
+					  ,COUNTRY_CD = :countryCd
+					  ,POSTAL_CODE = :postalCode
+					  ,EMAIL = :email
+					  ,URL = :url
+					  ,CHG_ID = :chgId
+					  ,CHG_DT = :chgDt
+					WHERE CORP_ID = :corpId
+				END
+			COMMIT TRANSACTION
+		]]>
+		</query>
+		<parameter name="custCode" required="false" />
+		<parameter name="custName" required="false" />
+		<parameter name="segmentCd" required="false" />
+		<parameter name="statusCd" required="false" />
+		<parameter name="contactChannelCd" required="false" />
+		<parameter name="ownerId" required="false" />
+		<parameter name="comment" required="false" />
+		<parameter name="notCallYn" required="false" />
+		<parameter name="notSmsYn" required="false" />
+		<parameter name="notEmailYn" required="false" />
+		<parameter name="notMailYn" required="false" />
+		<parameter name="chgId" required="false" />
+		<parameter name="chgDt" required="false" />
+		<parameter name="companyName" required="false" />
+		<parameter name="registrationId" required="false" />
+		<parameter name="taxId" required="false" />
+		<parameter name="industryCd" required="false" />
+		<parameter name="companySizeCd" required="false" />
+		<parameter name="revenueCd" required="false" />
+		<parameter name="workPhone" required="false" />
+		<parameter name="workPhoneExt" required="false" />
+		<parameter name="faxPhone" required="false" />
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="url" required="false" />
+		<parameter name="corpId" required="true" />
+	</sql-service>
+
+	<sql-service name="CUST.INSERT_CUST_MASTER" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+			INSERT INTO TP_CUST_MASTER (
+				   IND_ID
+				  ,CORP_ID
+				  ,CUST_CODE
+				  ,CUST_NAME
+				  ,TYPE_CD
+				  ,SEGMENT_CD
+				  ,STATUS_CD
+				  ,CONTACT_CHANNEL_CD
+				  ,LANGUAGE_CD
+				  ,TOT_SPENT_AMT
+				  ,LAST_PURCHASED_DT
+				  ,OWNER_ID
+				  ,COMMENT
+				  ,NOT_CALL_YN
+				  ,NOT_SMS_YN
+				  ,NOT_EMAIL_YN
+				  ,NOT_MAIL_YN
+				  ,REG_ID
+				  ,REG_DT
+				) VALUES (
+				   :indId
+				  ,:corpId
+				  ,:custCode
+				  ,:custName
+				  ,:typeCd
+				  ,:segmentCd
+				  ,:statusCd
+				  ,:contactChannelCd
+				  ,:languageCd
+				  ,:totSpentAmt
+				  ,:lastPurchasedDt
+				  ,:ownerId
+				  ,:comment
+				  ,:notCallYn
+				  ,:notSmsYn
+				  ,:notEmailYn
+				  ,:notMailYn
+				  ,:regId
+				  ,:regDt
+				)
+		]]>
+		</query>
+		<parameter name="indId" required="false" />
+		<parameter name="corpId" required="false" />
+		<parameter name="custCode" required="false" />
+		<parameter name="custName" required="false" />
+		<parameter name="typeCd" required="false" />
+		<parameter name="segmentCd" required="false" />
+		<parameter name="statusCd" required="false" />
+		<parameter name="contactChannelCd" required="false" />
+		<parameter name="languageCd" required="false" />
+		<parameter name="totSpentAmt" required="false" />
+		<parameter name="lastPurchasedDt" required="false" />
+		<parameter name="ownerId" required="false" />
+		<parameter name="comment" required="false" />
+		<parameter name="notCallYn" required="false" />
+		<parameter name="notSmsYn" required="false" />
+		<parameter name="notEmailYn" required="false" />
+		<parameter name="notMailYn" required="false" />
+		<parameter name="regId" required="false" />
+		<parameter name="regDt" required="false" />
+	</sql-service>
+
+	<sql-service name="CONTACT.SQL_FIND_CUSTOMER_LIST_CONTACT" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+           SELECT CUST.CUST_ID
+              ,CUST.CONT_ID
+              ,LANG1.CODE_NAME AS RELATION_NAME
+              ,CUST.RELATION_CD
+              ,IND.FIRST_NAME
+              ,IND.LAST_NAME
+              ,IND.MOBILE_NO
+              ,IND.HOME_PHONE
+              ,IND.EMAIL
+              ,CUST.REG_ID
+              ,CUST.REG_DT
+              ,CUST.CHG_ID
+              ,CUST.CHG_DT
+          FROM TP_CUST_CONTACT CUST
+          LEFT JOIN TP_CONTACT CONT ON CUST.CONT_ID = CONT.CONT_ID
+          LEFT JOIN TP_INDIVIDUAL IND ON CONT.IND_ID = IND.IND_ID
+          LEFT JOIN TP_CODEBOOK_LANG LANG1 ON LANG1.CODE_TYPE = 'RELATION' AND LANG1.CODE_ID = CUST.RELATION_CD AND LANG1.LANG_CD = :langCd
+          WHERE CUST.CUST_ID = :custId
+        ]]>
+		</query>
+		<parameter name='custId' required="false" />
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="CONTACT.SQL_FIND_CUSTOMER_CONTACT" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+           SELECT CUST.CUST_ID
+              ,CUST.CONT_ID
+              ,CUST.RELATION_CD
+              ,IND.FIRST_NAME
+              ,IND.LAST_NAME
+              ,IND.MOBILE_NO
+              ,IND.HOME_PHONE
+              ,IND.WORK_PHONE
+              ,IND.FAX_PHONE
+              ,IND.EMAIL
+              ,IND.ADDR_1
+              ,IND.ADDR_2
+              ,IND.SUB_AREA
+              ,IND.AREA
+              ,IND.PROVINCE
+              ,IND.POSTAL_CODE
+              ,IND.COUNTRY_CD
+              ,IND.IND_ID
+              
+          FROM TP_CUST_CONTACT CUST
+          LEFT JOIN TP_CONTACT CONT ON CUST.CONT_ID = CONT.CONT_ID
+          LEFT JOIN TP_INDIVIDUAL IND ON CONT.IND_ID = IND.IND_ID
+          WHERE 1=1
+          ${#custId?.text}
+          ${#contId?.text}
+        ]]>
+		</query>
+		<parameter name='custId'> AND CUST.CUST_ID = :custId </parameter>
+		<parameter name='contId'> AND CUST.CONT_ID = :contId </parameter>
+	</sql-service>
+
+	<sql-service name="CONTACT.SQL_FIND_CUSTOMER_CONTACT_BY_ID" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+           SELECT CUST.CUST_ID
+              ,CUST.CONT_ID
+              ,CUST.RELATION_CD
+              ,IND.FIRST_NAME
+              ,IND.LAST_NAME
+              ,IND.MOBILE_NO
+              ,IND.HOME_PHONE
+              ,IND.WORK_PHONE
+              ,IND.FAX_PHONE
+              ,IND.EMAIL
+              ,IND.ADDR_1
+              ,IND.ADDR_2
+              ,IND.SUB_AREA
+              ,IND.AREA
+              ,IND.PROVINCE
+              ,IND.POSTAL_CODE
+              ,IND.COUNTRY_CD
+              ,IND.IND_ID
+              
+          FROM TP_CUST_CONTACT CUST
+          LEFT JOIN TP_CONTACT CONT ON CUST.CONT_ID = CONT.CONT_ID
+          LEFT JOIN TP_INDIVIDUAL IND ON CONT.IND_ID = IND.IND_ID
+          WHERE 1=1
+          ${#custContId?.text}
+        ]]>
+		</query>
+		<parameter name='custContId'> AND CUST.CUST_CONT_ID = :custContId </parameter>
+	</sql-service>
+
+	<sql-service name="CONTACT.SQL_COUNT_CUSTOMER_CONTACT" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+            SELECT count(1) 
+            FROM TP_CUST_CONTACT CUST
+            WHERE CUST.CUST_ID = :custId
+            AND CUST.CONT_ID = :contId
+        ]]>
+		</query>
+		<parameter name='custId'> AND CUST.CUST_ID = :custId </parameter>
+		<parameter name='contId'> AND CUST.CONT_ID = :contId </parameter>
+	</sql-service>
+
+	<sql-service name="CONTACT.SQL_FIND_LIST_CONTACT" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+            SELECT CT.CONT_ID, 
+            IND.FIRST_NAME, 
+            IND.LAST_NAME, 
+            IND.CITIZEN_ID, 
+            IND.MOBILE_NO,
+            IND.HOME_PHONE,
+            IND.FAX_PHONE,
+            IND.WORK_PHONE,
+            IND.ADDR_1,
+            IND.ADDR_2,
+            IND.SUB_AREA,
+            IND.AREA,
+            IND.PROVINCE,
+            IND.POSTAL_CODE,
+            IND.COUNTRY_CD,
+            IND.JOB_TITLE_CD,
+            cb2.CODE_NAME AS JOB_TITLE_NAME,
+            cb.CODE_NAME AS COUNTRY_NAME
+            
+            FROM TP_CONTACT CT
+            LEFT OUTER JOIN TP_INDIVIDUAL IND ON IND.IND_ID = CT.IND_ID
+            LEFT OUTER JOIN TP_CODEBOOK_LANG cb on cb.CODE_TYPE = 'COUNTRY' and IND.COUNTRY_CD = cb.CODE_ID and cb.LANG_CD = :langCd
+            LEFT OUTER JOIN TP_CODEBOOK_LANG cb2 on cb2.CODE_TYPE = 'JOB_TITLE' and IND.JOB_TITLE_CD = cb2.CODE_ID and cb2.LANG_CD = :langCd
+            WHERE 1=1
+            ${#firstName?.text}
+            ${#lastName?.text}
+            ${#mobileNo?.text}
+        ]]>
+		</query>
+		<parameter name='firstName' suffix="%"> AND IND.FIRST_NAME like :firstName </parameter>
+		<parameter name='lastName' suffix="%"> AND IND.LAST_NAME like :lastName </parameter>
+		<parameter name='mobileNo'> AND IND.MOBILE_NO = :mobileNo </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="CONTACT.UPDATE_CONTACT" type="named-parameter" showSql="true">
+		<description>Only SQL 2000 Server</description>
+		<query><![CDATA[
+            
+            BEGIN TRANSACTION
+            BEGIN
+            
+            UPDATE TP_INDIVIDUAL SET
+                  FIRST_NAME = :firstName 
+                  ,LAST_NAME = :lastName
+                  ,MOBILE_NO = :mobileNo
+                  ,HOME_PHONE = :homePhone
+                  ,WORK_PHONE = :workPhone
+                  ,FAX_PHONE = :faxPhone
+                  ,EMAIL = :email
+                  ,ADDR_1 = :addr1 
+                  ,ADDR_2 = :addr2
+                  ,SUB_AREA = :subArea
+                  ,AREA = :area 
+                  ,PROVINCE = :province
+                  ,POSTAL_CODE = :postalCode
+                  ,COUNTRY_CD = :countryCd
+                  ,CHG_ID = :chgId  
+                  ,CHG_DT = GETDATE()
+            WHERE IND_ID = :indId
+            
+            END
+            
+            BEGIN
+            UPDATE TP_CUST_CONTACT SET
+                RELATION_CD = :relationCd
+                ,CHG_ID = :chgId  
+                ,CHG_DT = GETDATE()
+            WHERE CUST_ID = :custId AND CONT_ID = :contId
+            
+            END
+            
+            COMMIT TRANSACTION
+        ]]>
+		</query>
+		<parameter name="firstName" required="false" />
+		<parameter name="lastName" required="false" />
+		<parameter name="mobileNo" required="false" />
+		<parameter name="homePhone" required="false" />
+		<parameter name="workPhone" required="false" />
+		<parameter name="faxPhone" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="chgId" required="false" />
+		<parameter name="relationCd" required="false" />
+		<parameter name="indId" required="false" />
+		<parameter name="custId" required="false" />
+		<parameter name="contId" required="false" />
+	</sql-service>
+
+	<sql-service name="CONTACT.INSERT_CONTACT" type="named-parameter" showSql="true">
+		<description>Only SQL 2000 Server</description>
+		<query><![CDATA[
+            BEGIN TRANSACTION
+            BEGIN
+                
+            DECLARE @indId int
+            DECLARE @contId int
+            
+            INSERT INTO TP_INDIVIDUAL ( 
+              FIRST_NAME 
+              ,LAST_NAME
+              ,MOBILE_NO
+              ,HOME_PHONE
+              ,WORK_PHONE
+              ,FAX_PHONE
+              ,EMAIL
+              ,ADDR_1
+              ,ADDR_2
+              ,SUB_AREA
+              ,AREA
+              ,PROVINCE
+              ,POSTAL_CODE
+              ,COUNTRY_CD
+              ,REG_ID
+              ,REG_DT
+            ) VALUES (
+              :firstName 
+             ,:lastName
+             ,:mobileNo  
+             ,:homePhone  
+             ,:workPhone  
+             ,:faxPhone
+             ,:email
+             ,:addr1 
+             ,:addr2 
+             ,:subArea 
+             ,:area 
+             ,:province
+             ,:postalCode  
+             ,:countryCd 
+             ,:regId  
+             ,GETDATE()
+            )
+            
+            SELECT @indId = scope_identity()
+            
+            INSERT INTO TP_CONTACT (IND_ID, REG_ID, REG_DT) 
+            VALUES (@indId, :regId, GETDATE())
+            
+            SELECT @contId = scope_identity()
+            
+            INSERT INTO TP_CUST_CONTACT(
+                CUST_ID,
+                CONT_ID ,
+                RELATION_CD ,
+                REG_ID ,
+                REG_DT 
+            ) VALUES (
+                :custId,
+                @contId,
+                :relationCd,
+                :regId,
+                GETDATE()
+            )
+            
+            END
+            COMMIT TRANSACTION
+        ]]>
+		</query>
+		<parameter name="firstName" required="false" />
+		<parameter name="lastName" required="false" />
+		<parameter name="mobileNo" required="false" />
+		<parameter name="homePhone" required="false" />
+		<parameter name="workPhone" required="false" />
+		<parameter name="faxPhone" required="false" />
+		<parameter name="email" required="false" />
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="regId" required="false" />
+		<parameter name="relationCd" required="false" />
+		<parameter name="custId" required="false" />
+	</sql-service>
+
+	<sql-service name="CONTACT.INSERT_CUSTOMER_CONTACT" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+            INSERT INTO TP_CUST_CONTACT (
+                   CUST_ID
+                  ,CONT_ID
+                  ,RELATION_CD
+                  ,REG_ID
+                  ,REG_DT
+                ) VALUES (
+                   :custId
+                  ,:contId
+                  ,:relationCd
+                  ,:regId
+                  ,GETDATE()
+                )
+        ]]>
+		</query>
+		<parameter name="custId" required="false" />
+		<parameter name="contId" required="false" />
+		<parameter name="relationCd" required="false" />
+		<parameter name="regId" required="false" />
+	</sql-service>
+
+	<sql-service name="CONTACT.DELETE_CUSTOMER_CONTACT" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+            DELETE FROM TP_CUST_CONTACT
+            WHERE CUST_ID = :custId
+            AND CONT_ID = :contId
+        ]]>
+		</query>
+		<parameter name="custId" required="false" />
+		<parameter name="contId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.SQL_FIND_CUSTOMER_LIST_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+           SELECT ADDR.ADDR_ID
+                  ,ADDR.ADDR_1
+                  ,ADDR.ADDR_2
+                  ,ADDR.SUB_AREA
+                  ,ADDR.AREA
+                  ,ADDR.PROVINCE
+                  ,ADDR.COUNTRY_CD
+                  ,LANG.CODE_NAME AS COUNTRY_NAME
+                  ,ADDR.POSTAL_CODE
+                  ,ADDR.ADDR_TYPE_CD
+                  ,LANG2.CODE_NAME AS ADDR_TYPE_NAME
+                  ,ADDR.REG_ID
+                  ,ADDR.REG_DT
+                  ,ADDR.CHG_ID
+                  ,ADDR.CHG_DT
+                  ,CUST.PRIMARY_YN
+                  ,CUST.CUST_ID
+              
+          FROM TP_CUST_ADDRESS CUST
+          LEFT OUTER JOIN TP_ADDRESS ADDR ON CUST.ADDR_ID = ADDR.ADDR_ID
+          LEFT OUTER JOIN TP_CODEBOOK_LANG LANG ON LANG.CODE_TYPE = 'COUNTRY' AND ADDR.COUNTRY_CD = LANG.CODE_ID AND LANG.LANG_CD = :langCd
+          LEFT OUTER JOIN TP_CODEBOOK_LANG LANG2 ON LANG2.CODE_TYPE = 'ADDRESS_TYPE' AND ADDR.ADDR_TYPE_CD = LANG2.CODE_ID AND LANG2.LANG_CD = :langCd
+          WHERE 1=1
+          ${#custId?.text}
+          
+        ]]>
+		</query>
+		<parameter name='custId'> AND CUST.CUST_ID = :custId </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.INSERT_ADDRESS" type="named-parameter" showSql="true">
+		<description>Only SQL 2000 Server</description>
+		<query><![CDATA[
+            BEGIN TRANSACTION
+            BEGIN
+                
+            DECLARE @addrId int
+            
+            INSERT INTO TP_ADDRESS ( 
+              ADDR_1 
+              ,ADDR_2
+              ,SUB_AREA
+              ,AREA
+              ,PROVINCE
+              ,COUNTRY_CD
+              ,POSTAL_CODE
+              ,ADDR_TYPE_CD
+              ,REG_ID
+              ,REG_DT
+            ) VALUES (
+              :addr1 
+             ,:addr2
+             ,:subArea  
+             ,:area  
+             ,:province  
+             ,:countryCd
+             ,:postalCode
+             ,:addrTypeCd
+             ,:regId  
+             ,GETDATE()
+            )
+            
+            SELECT @addrId = scope_identity()
+            
+            INSERT INTO TP_CUST_ADDRESS(
+                CUST_ID,
+                ADDR_ID ,
+                PRIMARY_YN ,
+                REG_ID ,
+                REG_DT 
+            ) VALUES (
+                :custId,
+                @addrId,
+                'N',
+                :regId,
+                GETDATE()
+            )
+            
+            END
+            COMMIT TRANSACTION
+        ]]>
+		</query>
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="addrTypeCd" required="false" />
+		<parameter name="regId" required="false" />
+		<parameter name="custId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.INSERT_CUSTOMER_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+            INSERT INTO TP_CUST_ADDRESS(
+                CUST_ID,
+                ADDR_ID ,
+                PRIMARY_YN ,
+                REG_ID ,
+                REG_DT 
+            ) VALUES (
+                :custId,
+                :addrId,
+                'N',
+                :regId,
+                GETDATE()
+            )
+        ]]>
+		</query>
+		<parameter name="custId" required="false" />
+		<parameter name="addrId" required="false" />
+		<parameter name="regId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.COUNT_CUSTOMER_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+            SELECT count(1) 
+            FROM TP_CUST_ADDRESS ADDR
+            WHERE ADDR.CUST_ID = :custId
+            AND ADDR.ADDR_ID = :addrId
+        ]]>
+		</query>
+		<parameter name="custId" required="false" />
+		<parameter name="addrId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.UPDATE_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+            
+            BEGIN TRANSACTION
+            BEGIN
+            
+            UPDATE TP_ADDRESS SET 
+              ADDR_1 = :addr1 
+              ,ADDR_2 = :addr2
+              ,SUB_AREA = :subArea  
+              ,AREA = :area  
+              ,PROVINCE = :province
+              ,COUNTRY_CD = :countryCd
+              ,POSTAL_CODE = :postalCode
+              ,ADDR_TYPE_CD = :addrTypeCd
+              ,CHG_ID = :chgId 
+              ,CHG_DT = GETDATE()
+            WHERE ADDR_ID = :addrId
+            
+            END
+            
+            COMMIT TRANSACTION
+        ]]>
+		</query>
+		<parameter name="addr1" required="false" />
+		<parameter name="addr2" required="false" />
+		<parameter name="subArea" required="false" />
+		<parameter name="area" required="false" />
+		<parameter name="province" required="false" />
+		<parameter name="countryCd" required="false" />
+		<parameter name="postalCode" required="false" />
+		<parameter name="addrTypeCd" required="false" />
+		<parameter name="chgId" required="false" />
+		<parameter name="addrId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.DELETE_CUSTOMER_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+            DELETE FROM TP_CUST_ADDRESS
+            WHERE CUST_ID = :custId
+            AND ADDR_ID = :addrId
+        ]]>
+		</query>
+		<parameter name="custId" required="false" />
+		<parameter name="addrId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.FIND_CUSTOMER_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+            SELECT ADDR.ADDR_ID
+                  ,ADDR.ADDR_1
+                  ,ADDR.ADDR_2
+                  ,ADDR.SUB_AREA
+                  ,ADDR.AREA
+                  ,ADDR.PROVINCE
+                  ,ADDR.COUNTRY_CD
+                  ,ADDR.POSTAL_CODE
+                  ,ADDR.ADDR_TYPE_CD
+                  ,ADDR.REG_ID
+                  ,ADDR.REG_DT
+                  ,ADDR.CHG_ID
+                  ,ADDR.CHG_DT
+            FROM TP_ADDRESS ADDR
+            WHERE 1=1
+            ${#addrId?.text}
+        ]]>
+		</query>
+		<parameter name='addrId'> AND ADDR_ID = :addrId </parameter>
+	</sql-service>
+
+	<sql-service name="ADDRESS.UPDATE_PRIMARY_ADDRESS" type="named-parameter" showSql="true">
+		<description>Only SQL 2000 Server</description>
+		<query><![CDATA[
+            
+            BEGIN TRANSACTION
+            BEGIN
+            
+            UPDATE TP_CUST_ADDRESS SET
+                  PRIMARY_YN = 'N'
+            WHERE CUST_ID = :custId
+            
+            END
+            
+            BEGIN
+            UPDATE TP_CUST_ADDRESS SET
+                  PRIMARY_YN = 'Y'
+            WHERE CUST_ID = :custId
+            AND ADDR_ID = :addrId
+            
+            END
+            
+            COMMIT TRANSACTION
+        ]]>
+		</query>
+		<parameter name="custId" required="false" />
+		<parameter name="addrId" required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.SQL_FIND_LIST_ADDRESS" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+            SELECT ADDR.ADDR_ID
+                  ,ADDR.ADDR_1
+                  ,ADDR.ADDR_2
+                  ,ADDR.SUB_AREA
+                  ,ADDR.AREA
+                  ,ADDR.PROVINCE
+                  ,ADDR.COUNTRY_CD
+                  ,ADDR.POSTAL_CODE
+                  ,ADDR.ADDR_TYPE_CD
+                  ,ADDR.REG_ID
+                  ,ADDR.REG_DT
+                  ,ADDR.CHG_ID
+                  ,ADDR.CHG_DT
+                  ,LANG2.CODE_NAME AS ADDR_TYPE_NAME
+            FROM TP_ADDRESS ADDR
+            LEFT OUTER JOIN TP_CODEBOOK_LANG LANG2 ON LANG2.CODE_TYPE = 'ADDRESS_TYPE' AND ADDR.ADDR_TYPE_CD = LANG2.CODE_ID AND LANG2.LANG_CD = :langCd
+            WHERE 1=1
+            ${#addr?.text}
+            ${#subArea?.text}
+            ${#area?.text}
+            ${#province?.text}
+            ${#countryCd?.text}
+            ${#postalCode?.text}
+            
+        ]]>
+		</query>
+		<parameter name='addr' suffix="%"> AND ADDR.ADDR_1 LIKE :addr </parameter>
+		<parameter name='subArea'> AND ADDR.SUB_AREA = :subArea </parameter>
+		<parameter name='area'> AND ADDR.AREA = :area </parameter>
+		<parameter name='province'> AND ADDR.PROVINCE = :province </parameter>
+		<parameter name='countryCd'> AND ADDR.COUNTRY_CD = :countryCd </parameter>
+		<parameter name='postalCode'> AND ADDR.POSTAL_CODE = :postalCode </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="ADDRESS.FIND_CUSTOMER_ADDRESS_BY_ID" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[    
+        
+            SELECT ADDR.ADDR_ID
+                  ,ADDR.ADDR_1
+                  ,ADDR.ADDR_2
+                  ,ADDR.SUB_AREA
+                  ,ADDR.AREA
+                  ,ADDR.PROVINCE
+                  ,ADDR.COUNTRY_CD
+                  ,ADDR.POSTAL_CODE
+                  ,ADDR.ADDR_TYPE_CD
+                  ,ADDR.REG_ID
+                  ,ADDR.REG_DT
+                  ,ADDR.CHG_ID
+                  ,ADDR.CHG_DT
+                  ,C_ADDR.CUST_ID
+                  ,C_ADDR.CUST_ADDR_ID
+            FROM TP_CUST_ADDRESS C_ADDR
+            LEFT OUTER JOIN TP_ADDRESS ADDR ON ADDR.ADDR_ID = C_ADDR.ADDR_ID
+            WHERE 1=1
+            ${#custAddrId?.text}
+        ]]>
+		</query>
+		<parameter name='custAddrId'> AND C_ADDR.CUST_ADDR_ID = :custAddrId </parameter>
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUST_SERVICE_REQUEST_LIST" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+		
+				SELECT	
+					 SR.SR_NUMBER AS  srNumber
+					,CAT1.CAT_NAME  AS  srTypeProblem1
+	        		,CAT2.CAT_NAME  AS  srTypeProblem2
+	        		,CAT3.CAT_NAME  AS  srTypeProblem3
+	        		,CAT4.CAT_NAME  AS  srTypeProblem4
+	        		,CAT5.CAT_NAME  AS  srTypeProblem5
+					,CB3.CODE_NAME  AS  srStatusDesc
+					,sla.SLA_NAME  AS  srPriorityDesc
+					
+					,SR.OPENED_DT  AS  srOpenedDate
+					,SR.DUE_DT  AS  srDueDate
+					,SR.CLOSED_DT  AS  srCloseDate
+					, ISNULL(EMP1.FIRST_NAME, '')+' '+ISNULL(EMP1.LAST_NAME,'') AS  srOwnerName
+				 	
+					,SR.SR_TYPE_PROBLEM1 AS  srTypeProblem1Cd
+					,SR.SR_TYPE_PROBLEM2 AS  srTypeProblem2Cd
+					,SR.SR_TYPE_PROBLEM3 AS  srTypeProblem3Cd
+					,SR.SR_TYPE_PROBLEM4 AS  srTypeProblem4Cd
+					,SR.SR_TYPE_PROBLEM5 AS  srTypeProblem5Cd
+				 	,SR.TITLE  AS srSubject
+				 	
+					,SR.PRIORITY_CD AS  srpriorityCd
+					,SR.STATUS_CD  AS  srStatusCd
+					,SR.OWNER_ID  AS  srOwnerId				
+					,SR.CUST_ID  AS  srCustId
+					,SR.CHANNEL_CD  AS  srChannelCd
+					,CB5.CODE_NAME  AS  srChannelName
+					,CASE SR.CUST_TYPE_CD 										
+						WHEN 'I' THEN ISNULL(CUST_IND.FIRST_NAME, '')+' '+ISNULL(CUST_IND.LAST_NAME,'') 									
+						ELSE CUST_CORP.COMPANY_NAME									
+					  END AS  customerName
+					,SR.REG_ID  AS  regId
+					,SR.REG_DT  AS  regDt
+					,ISNULL(EMP2.FIRST_NAME, '')+' '+ISNULL(EMP2.LAST_NAME,'') AS regName										
+					,ISNULL(EMP3.FIRST_NAME, '')+' '+ISNULL(EMP3.LAST_NAME,'') AS chgName		
+					  
+				FROM TP_SR SR 										
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT1 CAT1 ON SR.SR_TYPE_PROBLEM1 = CAT1.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT2 CAT2 ON SR.SR_TYPE_PROBLEM2 = CAT2.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT3 CAT3 ON SR.SR_TYPE_PROBLEM3 = CAT3.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT4 CAT4 ON SR.SR_TYPE_PROBLEM4 = CAT4.CONTENT_CAT_ID
+				LEFT  OUTER JOIN  TP_KB_CONTENT_CAT5 CAT5 ON SR.SR_TYPE_PROBLEM5 = CAT5.CONTENT_CAT_ID									
+				LEFT OUTER JOIN   TP_SLA sla ON SR.PRIORITY_CD = sla.SLA_ID AND sla.STATUS_CD='01'
+				
+				LEFT  OUTER JOIN TP_CODEBOOK_LANG CB3 ON SR.STATUS_CD = CB3.CODE_ID AND CB3.CODE_TYPE = 'SRQ_STATUS'	AND CB3.LANG_CD = :langCd									
+				LEFT  OUTER JOIN TP_CODEBOOK_LANG CB4 ON SR.PRIORITY_CD = CB4.CODE_ID AND CB4.CODE_TYPE = 'SRQ_PRIORITY'	AND CB4.LANG_CD = :langCd									
+				LEFT  OUTER JOIN TP_CODEBOOK_LANG CB5 ON SR.PRIORITY_CD = CB5.CODE_ID AND CB5.CODE_TYPE = 'SRQ_CHANNEL'	AND CB5.LANG_CD = :langCd
+				
+				LEFT  OUTER JOIN TP_USR_MASTER USR1 ON SR.OWNER_ID = USR1.USER_ID										
+				LEFT  OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID										
+				LEFT  OUTER JOIN TP_USR_MASTER USR2 ON SR.REG_ID = USR2.USER_ID										
+				LEFT  OUTER JOIN TP_EMPLOYEE EMP2 ON USR2.EMP_ID = EMP2.EMP_ID										
+				LEFT  OUTER JOIN TP_USR_MASTER USR3 ON SR.CHG_ID = USR3.USER_ID										
+				LEFT  OUTER JOIN TP_EMPLOYEE EMP3 ON USR3.EMP_ID = EMP3.EMP_ID										
+				LEFT  OUTER JOIN TP_CUST_MASTER CUST ON SR.CUST_ID = CUST.CUST_ID  										
+				LEFT  OUTER JOIN TP_INDIVIDUAL CUST_IND ON CUST.IND_ID = CUST_IND.IND_ID 										
+				LEFT  OUTER JOIN TP_CORPORATION CUST_CORP ON CUST.CORP_ID = CUST_CORP.CORP_ID										
+												
+				WHERE	1=1										
+				AND	SR.SR_GROUP =  'SR'	
+                ${#custId?.text}
+                
+                ORDER BY SR.REG_DT DESC
+            ]]>
+		</query>
+		<parameter name='custId'> AND SR.CUST_ID = :custId </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUST_COMPLAINT_LIST" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+                SELECT
+                
+                SR.SR_NUMBER AS  cpNumber
+                ,CB1.CODE_NAME  AS  cpTypeDesc
+                ,CB2.CODE_NAME  AS  cpSubTypeDesc
+                ,CB4.CODE_NAME  AS  cpPriority
+                ,CB6.CODE_NAME  AS  cpSeverity
+                ,CB3.CODE_NAME  AS  cpStatusDesc
+                ,ISNULL(EMP1.FIRST_NAME, '')+' '+ISNULL(EMP1.LAST_NAME,'') AS  cpOwnerName
+                ,DEP.DEPT_NAME AS cpOwnerDepartment
+                ,SR.DUE_DT  AS  cpDueDate
+                ,SR.REG_DT  AS  cpCreateDate
+                  
+                FROM TP_SR SR                                       
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB1 ON SR.TYPE_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'CP_TYPE' AND CB1.LANG_CD = :langCd                                      
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB2 ON SR.SUB_TYPE_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'CP_SUB_TYPE' AND CB2.LANG_CD = :langCd                                      
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB3 ON SR.STATUS_CD = CB3.CODE_ID AND CB3.CODE_TYPE = 'SRQ_STATUS'    AND CB3.LANG_CD = :langCd                                       
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB4 ON SR.PRIORITY_CD = CB4.CODE_ID AND CB4.CODE_TYPE = 'SRQ_PRIORITY'    AND CB4.LANG_CD = :langCd                                           
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB6 ON SR.SEVERITY_CD = CB6.CODE_ID AND CB6.CODE_TYPE = 'SRQ_SEVERITY'    AND CB6.LANG_CD = :langCd                                               
+                LEFT  OUTER JOIN TP_DEPARTMENT DEP ON SR.OWNER_DEPT_CODE = DEP.DEPT_CODE                          
+                LEFT  OUTER JOIN TP_USR_MASTER USR1 ON SR.OWNER_ID = USR1.USER_ID
+                LEFT  OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID  
+                WHERE   1=1 
+                AND SR.SR_GROUP =  'CP' 
+                ${#custId?.text}
+                
+                ORDER BY SR.REG_DT DESC
+            ]]>
+		</query>
+		<parameter name='custId'> AND SR.CUST_ID = :custId </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUST_INCIDENT_LIST" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+                SELECT
+                
+                SR.SR_NUMBER AS  incNumber
+                ,CB1.CODE_NAME  AS  incTypeDesc
+                ,CB2.CODE_NAME  AS  incSubTypeDesc
+                ,CB4.CODE_NAME  AS  incPriority
+                ,CB3.CODE_NAME  AS  incStatusDesc
+                ,ISNULL(EMP1.FIRST_NAME, '')+' '+ISNULL(EMP1.LAST_NAME,'') AS  incOwnerName
+                ,DEP.DEPT_NAME AS incOwnerDepartment
+                ,SR.DUE_DT  AS  incDueDate
+                ,SR.REG_DT  AS  incCreateDate
+                  
+                FROM TP_SR SR                                       
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB1 ON SR.TYPE_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'SRQ_TYPE' AND CB1.LANG_CD = :langCd                                      
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB2 ON SR.SUB_TYPE_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'SRQ_SUB_TYPE' AND CB2.LANG_CD = :langCd                                      
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB3 ON SR.STATUS_CD = CB3.CODE_ID AND CB3.CODE_TYPE = 'SRQ_STATUS'    AND CB3.LANG_CD = :langCd                                       
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB4 ON SR.PRIORITY_CD = CB4.CODE_ID AND CB4.CODE_TYPE = 'SRQ_PRIORITY'    AND CB4.LANG_CD = :langCd                                           
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB5 ON SR.CHANNEL_CD = CB5.CODE_ID AND CB5.CODE_TYPE = 'SRQ_CHANNEL'  AND CB5.LANG_CD = :langCd
+                LEFT  OUTER JOIN TP_CODEBOOK_LANG CB6 ON SR.SEVERITY_CD = CB6.CODE_ID AND CB6.CODE_TYPE = 'SRQ_SEVERITY'    AND CB6.LANG_CD = :langCd                                               
+                LEFT  OUTER JOIN TP_DEPARTMENT DEP ON SR.OWNER_DEPT_CODE = DEP.DEPT_CODE                          
+                LEFT  OUTER JOIN TP_USR_MASTER USR1 ON SR.OWNER_ID = USR1.USER_ID
+                LEFT  OUTER JOIN TP_EMPLOYEE EMP1 ON USR1.EMP_ID = EMP1.EMP_ID  
+                WHERE   1=1 
+                AND SR.SR_GROUP =  'INC'    
+        
+                ${#custId?.text}
+                
+                ORDER BY SR.REG_DT DESC
+            ]]>
+		</query>
+		<parameter name='custId'> AND SR.CUST_ID = :custId </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.SQL_FIND_CUST_ASSET_LIST" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+                SELECT AST.ASSET_ID as assetId 
+                , AST.ASSET_CODE AS assetNo
+                , CB1.CODE_NAME AS assetType
+                , CB2.CODE_NAME AS assetSubType
+                , ISNULL(IND.FIRST_NAME, '') + ' ' + ISNULL(IND.LAST_NAME, '') AS assetContactPerson
+                , IND.MOBILE_NO AS assetContactNo
+                , CB3.CODE_NAME AS assetStatus
+                FROM TP_ASSET AST 
+                LEFT OUTER JOIN TP_CODEBOOK_LANG CB1 ON AST.TYPE_CD = CB1.CODE_ID AND CB1.CODE_TYPE = 'ASSET_TYPE' AND CB1.LANG_CD = :langCd 
+                LEFT OUTER JOIN TP_CODEBOOK_LANG CB2 ON AST.SUB_TYPE_CD = CB2.CODE_ID AND CB2.CODE_TYPE = 'ASSET_SUB_TYPE' AND CB2.LANG_CD = :langCd 
+                LEFT OUTER JOIN TP_CODEBOOK_LANG CB3 ON AST.STATUS_CD = CB3.CODE_ID AND CB3.CODE_TYPE = 'ASSET_STATUS' AND CB3.LANG_CD = :langCd 
+                LEFT OUTER JOIN TP_CONTACT CON ON AST.CONT_ID = CON.CONT_ID
+                LEFT OUTER JOIN TP_INDIVIDUAL IND ON CON.IND_ID = IND.IND_ID
+          
+                WHERE 1 = 1
+                ${#custId?.text}
+            ]]>
+		</query>
+		<parameter name='custId'> AND AST.CUST_ID = :custId </parameter>
+		<parameter name='langCd' required="false" />
+	</sql-service>
+
+	<sql-service name="CUST.SQL_INSERT_CONTACT_WITH_IND" type="named-parameter" showSql="true">
+		<description></description>
+		<query><![CDATA[
+                INSERT INTO TP_CONTACT (IND_ID, REG_ID, REG_DT) 
+                VALUES (:indId, :regId, GETDATE())
+             ]]>
+		</query>
+		<parameter name="indId" required="false" />
+		<parameter name='regId' required="false" />
+	</sql-service>
+	
+	<sql-service name="CUST.GET_CONTACT_BY_CUST_ID_LIST" type="named-parameter" showSql="true">
+		<description>For Display Service Request Detail</description>		
+		<query><![CDATA[	
+			SELECT
+				CUST.CONT_ID AS contId, 
+				IND.FIRST_NAME+' '+ IND.LAST_NAME AS fullName
+			FROM TP_CUST_CONTACT CUST
+			LEFT JOIN TP_CONTACT CONT ON CUST.CONT_ID = CONT.CONT_ID
+			LEFT JOIN TP_INDIVIDUAL IND ON CONT.IND_ID = IND.IND_ID
+			          
+			WHERE 1=1 
+			${#custId?.text}
+			ORDER BY IND.FIRST_NAME ASC
+		]]>
+		</query>
+		<parameter name='custId'> AND CUST.CUST_ID = :custId </parameter>
+	</sql-service>
+</query-collection>
