@@ -623,15 +623,5 @@ function hideAdvanceSearch(){
 	$('#btn_searchAdvanceSearch').show();	
 	
 }
-
-/* function getSRChannelListCombo(plaseSelectMsg){
-getCodeBookComboByCodeType($("#cmb_sr_channel"),"SRQ_CHANNEL",plaseSelectMsg);
-}
-function getSRStatusListCombo(plaseSelectMsg){
-getCodeBookComboByCodeType($("#cmb_sr_status"),"SRQ_STATUS",plaseSelectMsg);
-} 
-function getSRPriorityListCombo(plaseSelectMsg){
-getCodeBookComboByCodeType($("#cmb_sr_priority"),"SRQ_PRIORITY",plaseSelectMsg);
-} */
 </script>
 <!-- END JAVA SCRIPTS -->
